@@ -1,11 +1,15 @@
 {
   "common": {
-    "appName": "Quán Cà Phê"
+    "appName": "Hoa Yên Coffee",
+    "appNameShort": "HYC"
   },
   "sidebar": {
     "drinks": "Đồ Uống",
     "orders": "Đơn Hàng",
-    "categories": "Danh Mục"
+    "categories": "Danh Mục",
+    "revenues": "Doanh Thu",
+    "staffs": "Nhân Viên",
+    "branchShops": "Chi Nhánh"
   },
   "login": {
     "title": "Chào Mừng Trở Lại",
