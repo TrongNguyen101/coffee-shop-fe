@@ -1,11 +1,9 @@
 import { Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { LoginForm } from './components/LoginForm';
-import { useLogin } from './hooks/useLogin';
 import './styles/login.css';
 
 export function LoginPage() {
-  const { login, loading } = useLogin();
   const { t } = useTranslation();
 
   return (
@@ -13,7 +11,7 @@ export function LoginPage() {
       <Typography.Title level={3} className="login-title">
         {t('login.title')}
       </Typography.Title>
-      <LoginForm loading={loading} onSubmit={login} />
+      <LoginForm />
     </div>
   );
 }

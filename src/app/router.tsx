@@ -3,6 +3,8 @@ import { ProtectedRoute } from './ProtectedRoute';
 import { AuthLayout } from '@/layouts/AuthLayout';
 import { MainLayout } from '@/layouts/MainLayout';
 import { LoginPage } from '@/pages/login/LoginPage';
+import { DrinksPage } from '@/pages/drinks/DrinksPage';
+import { StaffsPage } from '@/pages/staffs/StaffsPage';
 
 export const router = createHashRouter([
   // Public routes — login wrapped in AuthLayout
@@ -25,7 +27,11 @@ export const router = createHashRouter([
         children: [
           {
             path: '/',
-            // element: <DrinksPage />,
+            element: <DrinksPage />,
+          },
+          {
+            path: '/staff',
+            element: <StaffsPage />,
           },
         ],
       },

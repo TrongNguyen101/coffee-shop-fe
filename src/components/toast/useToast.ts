@@ -13,7 +13,7 @@ export function useToast() {
   const show = (type: NotificationType, description: string, options: NotifyOptions = {}) => {
     const { title, duration = 3 } = options;
     notification[type]({
-      message: title,
+      title: title,
       description,
       duration,
       placement: 'topRight',
