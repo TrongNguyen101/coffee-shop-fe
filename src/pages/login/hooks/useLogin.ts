@@ -1,13 +1,17 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import type { FormInstance } from 'antd';
+import type { AxiosError } from 'axios';
 import { useAppDispatch } from '@/store/hooks';
-import { setUserId } from '@/store/authSlice';
+import { setProfile } from '@/store/authSlice';
 import { useToast } from '@/components/toast/useToast';
-import { loginApi } from '../api/loginApi';
-import type { LoginRequest } from '../types';
+import { getProfileApi } from '../api/profileApi';
+import { RESPONSE_CODE } from '@/constants/messages';
+import { getResponseMessage } from '@/utils/getResponseMessage';
+import type { LoginRequest, ErrorResponse } from '../types';
 
-export function useLogin() {
+export function useLogin(form: FormInstance<LoginRequest>) {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const toast = useToast();
@@ -16,12 +20,22 @@ export function useLogin() {
 
   const login = async (values: LoginRequest) => {
     setLoading(true);
-    toast.info(t('login.toastLoading'));
     try {
-      const response = await loginApi(values);
-      dispatch(setUserId(response.userId));
+      const profileResponse = await getProfileApi(values);
+      dispatch(setProfile(profileResponse.userProfile));
       toast.success(t('login.toastSuccess'));
       navigate('/', { replace: true });
+    } catch (err) {
+      const error = err as AxiosError<ErrorResponse>;
+      const data = error.response?.data;
+      if (data?.code === RESPONSE_CODE.INVALID_REQUEST && data.errorDetails) {
+        form.setFields(
+          data.errorDetails.map((detail) => ({
+            name: detail.field as keyof LoginRequest,
+            errors: [getResponseMessage(detail.message)],
+          })),
+        );
+      }
     } finally {
       setLoading(false);
     }

@@ -3,15 +3,15 @@ import { ENV } from '@/constants/evn';
 import { useAppSelector } from '@/store/hooks';
 
 export function ProtectedRoute() {
-  const userId = useAppSelector((state) => state.auth.userId);
+  const profile = useAppSelector((state) => state.auth.profile);
 
   // In mock mode, bypass authentication for development
   if (ENV.ENABLE_MOCK) {
     return <Outlet />;
   }
 
-  // In production, require userId — redirect to login if missing
-  if (!userId) {
+  // Require a loaded profile — redirect to login if missing
+  if (!profile) {
     return <Navigate to="/login" replace />;
   }
 

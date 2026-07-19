@@ -16,6 +16,10 @@ export const RESPONSE_CODE = {
 
   // Server errors
   INTERNAL_SERVER_ERROR: 'ER500',
+
+  // Validation errors
+  FIELD_REQUIRED: 'EV001',
+  PASSWORD_LENGTH_INCORRECT: 'EV002',
 } as const;
 
 export type ResponseCode = (typeof RESPONSE_CODE)[keyof typeof RESPONSE_CODE];
