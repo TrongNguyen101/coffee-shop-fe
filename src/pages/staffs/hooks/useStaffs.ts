@@ -1,17 +1,18 @@
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
-import { getStaffsApi, editStaffApi, deleteStaffApi, createStaffApi, getRolesApi, getShopNamesApi } from '../api/staffsApi';
+import {
+  getStaffsApi,
+  editStaffApi,
+  deleteStaffApi,
+  createStaffApi,
+  getRolesApi,
+  getShopNamesApi,
+} from '../api/staffsApi';
 import { RESPONSE_CODE } from '@/constants/messages';
 import { getResponseMessage } from '@/utils/getResponseMessage';
 import { useToast } from '@/components/toast/useToast';
-import type {
-  StaffItem,
-  StaffListParams,
-  PaginationInfo,
-  RoleItem,
-  ShopNameItem,
-} from '../types';
+import type { StaffItem, StaffListParams, PaginationInfo, RoleItem, ShopNameItem } from '../types';
 import type { StaffEditValues } from '../components/StaffEditModal';
 import type { StaffCreateValues } from '../components/StaffCreateModal';
 

@@ -60,10 +60,7 @@ export function StaffCreateModal({
       await onSubmit(values);
       handleClose();
     } catch (error) {
-      if (
-        axios.isAxiosError(error) &&
-        error.response?.data?.code === RESPONSE_CODE.CONFLICT
-      ) {
+      if (axios.isAxiosError(error) && error.response?.data?.code === RESPONSE_CODE.CONFLICT) {
         const message = (error.response?.data?.message ?? '').toLowerCase();
         let fieldName: keyof StaffCreateValues;
         let errorMsg: string;
@@ -141,7 +138,7 @@ export function StaffCreateModal({
             <Input />
           </Form.Item>
 
-          <Form.Item name="roleId" label={t('staffs.role')} >
+          <Form.Item name="roleId" label={t('staffs.role')}>
             <Select options={roleOptions} loading={optionsLoading} />
           </Form.Item>
 

@@ -56,10 +56,10 @@ export function StaffEditModal({
       form.resetFields();
 
       const matchedRole = roleOptions.find(
-        (r) => r.label.trim().toLowerCase() === record.roleName?.trim().toLowerCase()
+        (r) => r.label.trim().toLowerCase() === record.roleName?.trim().toLowerCase(),
       );
       const matchedShop = shopOptions.find(
-        (s) => s.label.trim().toLowerCase() === record.shopName?.trim().toLowerCase()
+        (s) => s.label.trim().toLowerCase() === record.shopName?.trim().toLowerCase(),
       );
 
       form.setFieldsValue({
@@ -82,10 +82,7 @@ export function StaffEditModal({
       await onSubmit(values);
       handleClose();
     } catch (error) {
-      if (
-        axios.isAxiosError(error) &&
-        error.response?.data?.code === RESPONSE_CODE.CONFLICT
-      ) {
+      if (axios.isAxiosError(error) && error.response?.data?.code === RESPONSE_CODE.CONFLICT) {
         // Set error message directly on the field
         form.setFields([
           {
@@ -142,7 +139,8 @@ export function StaffEditModal({
               },
             ]);
           }
-        }}>
+        }}
+      >
         <div className="grid grid-cols-2 gap-x-4">
           <Form.Item
             name="fullName"
