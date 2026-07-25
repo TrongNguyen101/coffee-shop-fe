@@ -19,6 +19,8 @@ import type { StaffCreateValues } from '../components/StaffCreateModal';
 const DEFAULT_PARAMS: StaffListParams = {
   page: 1,
   size: 10,
+  roleId: '',
+  branchShopId: '',
   search: '',
   sortBy: 'profileId',
   sortDirection: 'ASC',
@@ -80,6 +82,16 @@ export function useStaffs() {
   const handleSearch = (search: string) => {
     setIsSearch(true);
     setParams((prev) => ({ ...prev, search, page: 1 }));
+  };
+
+  const handleRoleFilter = (roleId: string) => {
+    setIsSearch(false);
+    setParams((prev) => ({ ...prev, roleId, page: 1 }));
+  };
+
+  const handleShopFilter = (branchShopId: string) => {
+    setIsSearch(false);
+    setParams((prev) => ({ ...prev, branchShopId, page: 1 }));
   };
 
   const handlePageChange = (page: number, size: number) => {
@@ -152,11 +164,15 @@ export function useStaffs() {
     currentPage: params.page,
     currentPageSize: params.size,
     searchKeyword: params.search,
+    currentRoleId: params.roleId,
+    currentBranchShopId: params.branchShopId,
     loading,
     searchLoading,
     showEmptyModal,
     closeEmptyModal: () => setShowEmptyModal(false),
     handleSearch,
+    handleRoleFilter,
+    handleShopFilter,
     handlePageChange,
     editStaff,
     editLoading,
