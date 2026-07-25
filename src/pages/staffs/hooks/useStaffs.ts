@@ -124,7 +124,12 @@ export function useStaffs() {
       try {
         await deleteStaffApi({ profileId });
         toast.success(t('staffs.deleteSuccess'));
-        await fetchStaffs(params);
+        const isLastItemOnPage = items.length === 1 && params.page > 1;
+        if (isLastItemOnPage) {
+          setParams((prev) => ({ ...prev, page: prev.page - 1 }));
+        } else {
+          await fetchStaffs(params);
+        }
       } catch (error) {
         if (axios.isAxiosError(error) && error.response?.data?.code === RESPONSE_CODE.NOT_FOUND) {
           toast.error(getResponseMessage(RESPONSE_CODE.NOT_FOUND));
@@ -133,7 +138,7 @@ export function useStaffs() {
         setDeleteLoading(false);
       }
     },
-    [params, fetchStaffs], // eslint-disable-line react-hooks/exhaustive-deps
+    [params, fetchStaffs, items.length], // eslint-disable-line react-hooks/exhaustive-deps
   );
 
   const createStaff = useCallback(
