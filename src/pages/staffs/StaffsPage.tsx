@@ -93,7 +93,6 @@ export function StaffsPage() {
       dataIndex: 'fullName',
       title: t('staffs.fullName'),
       width: 160,
-      sorter: true,
     },
     {
       key: 'username',
