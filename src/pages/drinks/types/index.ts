@@ -31,3 +31,21 @@ export interface GetDrinksRequest {
   sortBy?: string;
   sortDirection?: 'ASC' | 'DESC';
 }
+
+export interface CreateDrinkRequest {
+  drinkName: string;
+  imageUrl?: string;
+  status: number;
+  isDeleted: boolean;
+  price: number;
+  size: string;
+  shopId: string;
+  drinkCategoryId: string;
+  drinkDetailId?: string;
+}
+
+export interface CreateDrinkResponse {
+  code: string;
+  message: string;
+  traceId: string;
+}

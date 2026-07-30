@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getDrinksApi } from '../api/drinksAPI';
-import type { DrinkItem, GetDrinksRequest } from '../types';
+import { useTranslation } from 'react-i18next';
+import { useToast } from '@/components/toast/useToast';
+import { getDrinksApi, createDrinkApi } from '../api/drinksAPI';
+import type { DrinkItem, GetDrinksRequest, CreateDrinkRequest } from '../types';
 
 // Default pagination and sorting parameters
 const DEFAULT_PARAMS: GetDrinksRequest = {
@@ -13,6 +15,9 @@ const DEFAULT_PARAMS: GetDrinksRequest = {
 
 // Custom hook to handle drinks API fetching, searching, and pagination state
 export function useDrinks(initialPage = 1, initialSize = 10) {
+  const toast = useToast();
+  const { t } = useTranslation();
+
   // Query parameters state
   const [params, setParams] = useState<GetDrinksRequest>({
     ...DEFAULT_PARAMS,
@@ -27,6 +32,7 @@ export function useDrinks(initialPage = 1, initialSize = 10) {
   // Loading and modal UI states
   const [loading, setLoading] = useState(false);
   const [searchLoading, setSearchLoading] = useState(false);
+  const [createLoading, setCreateLoading] = useState(false);
   const [showEmptyModal, setShowEmptyModal] = useState(false);
   const [isSearch, setIsSearch] = useState(false);
 
@@ -77,6 +83,24 @@ export function useDrinks(initialPage = 1, initialSize = 10) {
     fetchDrinks(params, isSearch);
   }, [params, fetchDrinks, isSearch]);
 
+  // THÊM MỚI: Handler for creating new drink
+  const createDrink = useCallback(
+    async (values: CreateDrinkRequest) => {
+      setCreateLoading(true);
+      try {
+        await createDrinkApi(values);
+        toast.success(t('drinks.createSuccess') || 'Thêm đồ uống thành công!');
+        await fetchDrinks(params);
+      } catch (error) {
+        console.error('Failed to create drink:', error);
+        throw error;
+      } finally {
+        setCreateLoading(false);
+      }
+    },
+    [params, fetchDrinks, toast, t],
+  );
+
   // Handler for explicit search actions (resets page to 1)
   const handleSearch = (searchKeyword: string) => {
     setIsSearch(true);
@@ -105,10 +129,12 @@ export function useDrinks(initialPage = 1, initialSize = 10) {
     searchKeyword: params.search ?? '',
     loading,
     searchLoading,
+    createLoading,
     showEmptyModal,
     closeEmptyModal: () => setShowEmptyModal(false),
     handleSearch,
     handlePageChange,
+    createDrink,
     refresh: () => fetchDrinks(params, false),
   };
 }

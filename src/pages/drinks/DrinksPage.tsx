@@ -1,5 +1,6 @@
 import { useMemo, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { PlusOutlined } from '@ant-design/icons';
 import {
   Row,
   Col,
@@ -15,9 +16,12 @@ import {
 } from 'antd';
 import { SearchInput } from '@/components/search/SearchInput';
 import { useNotifyModal } from '@/components/modal/NotifyModal';
+import { useAppSelector } from '@/store/hooks';
+import { ROLES } from '@/permission/roles';
 import { useDrinks } from './hooks/useDrinks';
 import type { DrinkItem } from './types';
 import { DrinkCardGrouped, type GroupedDrink } from './components/DrinkCardGrouped';
+import { DrinkCreateModal } from './components/DrinkCreateModal';
 
 // Group drink variants by name/id into a single drink object
 function groupDrinks(items: DrinkItem[]): GroupedDrink[] {
@@ -47,18 +51,24 @@ export function DrinksPage() {
   const { t } = useTranslation();
   const { showError } = useNotifyModal();
 
+  // THÊM MỚI: Check role permission (STAFF role cannot see create button)
+  const roleName = useAppSelector((state) => state.auth.profile?.roleName);
+  const isStaff = roleName === ROLES.STAFF;
+
   // Fetch drinks data and handlers from custom hook
   const {
     items,
     totalElements,
     loading,
     searchLoading,
+    createLoading,
     currentPage,
     currentPageSize,
     showEmptyModal,
     closeEmptyModal,
     handleSearch,
     handlePageChange,
+    createDrink,
   } = useDrinks(1, 10);
 
   // Show error modal when user search returns no results
@@ -77,6 +87,7 @@ export function DrinksPage() {
 
   // Drawer and variant selection states
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [createOpen, setCreateOpen] = useState(false);
   const [selected, setSelected] = useState<GroupedDrink | null>(null);
   const [selectedVariantId, setSelectedVariantId] = useState<string | null>(null);
 
@@ -106,7 +117,7 @@ export function DrinksPage() {
         {t('drinks.title') || 'Đồ Uống'}
       </Typography.Title>
 
-      {/* Search Input */}
+      {/* Search Input & Action Bar */}
       <div className="flex items-center gap-2 flex-wrap">
         <div className="flex-1 min-w-48">
           <SearchInput
@@ -115,6 +126,13 @@ export function DrinksPage() {
             placeholder={t('drinks.searchPlaceholder') || 'Search drink...'}
           />
         </div>
+
+        {/* ADD NEW: Create a new button in the right corner; hidden for the STAFF role. */}
+        {!isStaff && (
+          <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateOpen(true)}>
+            {t('form.create') || 'Tạo mới'}
+          </Button>
+        )}
       </div>
 
       {/* Drink Cards Grid */}
@@ -249,6 +267,14 @@ export function DrinksPage() {
           </div>
         )}
       </Drawer>
+
+      {/* Create drink Create Modal */}
+      <DrinkCreateModal
+        open={createOpen}
+        onClose={() => setCreateOpen(false)}
+        onSubmit={createDrink}
+        loading={createLoading}
+      />
     </div>
   );
 }
