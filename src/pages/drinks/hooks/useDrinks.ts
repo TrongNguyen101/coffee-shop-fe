@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/components/toast/useToast';
-import { getDrinksApi, createDrinkApi } from '../api/drinksAPI';
+import { getDrinksApi, createDrinkApi, deleteDrinkApi } from '../api/drinksAPI';
 import type { DrinkItem, GetDrinksRequest, CreateDrinkRequest } from '../types';
 
 // Default pagination and sorting parameters
@@ -33,6 +33,7 @@ export function useDrinks(initialPage = 1, initialSize = 10) {
   const [loading, setLoading] = useState(false);
   const [searchLoading, setSearchLoading] = useState(false);
   const [createLoading, setCreateLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const [showEmptyModal, setShowEmptyModal] = useState(false);
   const [isSearch, setIsSearch] = useState(false);
 
@@ -79,11 +80,22 @@ export function useDrinks(initialPage = 1, initialSize = 10) {
 
   // Refetch data whenever query params or search flag changes
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    fetchDrinks(params, isSearch);
+    let isMounted = true;
+
+    const loadData = async () => {
+      if (isMounted) {
+        await fetchDrinks(params, isSearch);
+      }
+    };
+
+    void loadData();
+
+    return () => {
+      isMounted = false;
+    };
   }, [params, fetchDrinks, isSearch]);
 
-  // THÊM MỚI: Handler for creating new drink
+  // Handler for creating new drink
   const createDrink = useCallback(
     async (values: CreateDrinkRequest) => {
       setCreateLoading(true);
@@ -96,6 +108,24 @@ export function useDrinks(initialPage = 1, initialSize = 10) {
         throw error;
       } finally {
         setCreateLoading(false);
+      }
+    },
+    [params, fetchDrinks, toast, t],
+  );
+
+  // Handler for deleting drink (Soft Delete)
+  const deleteDrink = useCallback(
+    async (drinkId: string) => {
+      setDeleteLoading(true);
+      try {
+        await deleteDrinkApi({ drinkId });
+        toast.success(t('drinks.deleteSuccess') || 'Xoá đồ uống thành công!');
+        await fetchDrinks(params);
+      } catch (error) {
+        console.error('Failed to delete drink:', error);
+        toast.error(t('drinks.deleteError') || 'Xoá đồ uống thất bại!');
+      } finally {
+        setDeleteLoading(false);
       }
     },
     [params, fetchDrinks, toast, t],
@@ -130,11 +160,13 @@ export function useDrinks(initialPage = 1, initialSize = 10) {
     loading,
     searchLoading,
     createLoading,
+    deleteLoading,
     showEmptyModal,
     closeEmptyModal: () => setShowEmptyModal(false),
     handleSearch,
     handlePageChange,
     createDrink,
+    deleteDrink,
     refresh: () => fetchDrinks(params, false),
   };
 }

@@ -1,4 +1,5 @@
-import { Card, Typography } from 'antd';
+import { Card, Typography, Button } from 'antd';
+import { DeleteOutlined } from '@ant-design/icons';
 
 // Interface representing a single size variant
 export interface Variant {
@@ -22,10 +23,12 @@ export interface GroupedDrink {
 interface Props {
   record: GroupedDrink;
   onClick?: (record: GroupedDrink) => void;
+  onDelete?: (record: GroupedDrink) => void;
+  isStaff?: boolean;
 }
 
 // Component to display grouped drink card with starting price and variant count
-export function DrinkCardGrouped({ record, onClick }: Props) {
+export function DrinkCardGrouped({ record, onClick, onDelete, isStaff = false }: Props) {
   // Calculate lowest price among available size variants
   const lowest = record.variants.reduce((acc, v) => {
     const num = Number(String(v.price).replace(/[^0-9.-]+/g, '')) || 0;
@@ -45,11 +48,11 @@ export function DrinkCardGrouped({ record, onClick }: Props) {
       hoverable
       onClick={() => onClick?.(record)}
       cover={
-        /* Drink Image Cover with error fallback handler */
+        /* Drink Image Cover */
         <img
           alt="cover"
           src={record.imageUrl || fallbackImage}
-          style={{ height: 220, objectFit: 'cover' }}
+          style={{ height: 220, width: '100%', objectFit: 'cover' }}
           onError={(e) => {
             const el = e.currentTarget as HTMLImageElement;
             if (el.src !== fallbackImage) {
@@ -61,10 +64,27 @@ export function DrinkCardGrouped({ record, onClick }: Props) {
       styles={{ body: { padding: 12 } }}
       style={{ border: '1px solid rgba(0,0,0,0.06)', background: '#fff' }}
     >
-      {/* Drink Name */}
-      <Typography.Title level={5} className="mb-0!">
-        {record.drinkName}
-      </Typography.Title>
+      {/* Drink Name & Delete Button Row */}
+      <div className="flex items-center justify-between gap-2">
+        <Typography.Title level={5} className="mb-0! flex-1 truncate">
+          {record.drinkName}
+        </Typography.Title>
+
+        {/* Delete Button: Hidden for STAFF */}
+        {!isStaff && onDelete && (
+          <Button
+            danger
+            type="text"
+            shape="circle"
+            size="small"
+            icon={<DeleteOutlined />}
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(record);
+            }}
+          />
+        )}
+      </div>
 
       {/* Starting Price Display */}
       <div className="mt-1">

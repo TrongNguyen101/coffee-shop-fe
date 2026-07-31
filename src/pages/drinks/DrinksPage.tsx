@@ -1,6 +1,6 @@
 import { useMemo, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined, ExclamationCircleFilled } from '@ant-design/icons';
 import {
   Row,
   Col,
@@ -13,6 +13,7 @@ import {
   Drawer,
   Radio,
   Select,
+  Modal,
 } from 'antd';
 import { SearchInput } from '@/components/search/SearchInput';
 import { useNotifyModal } from '@/components/modal/NotifyModal';
@@ -51,7 +52,7 @@ export function DrinksPage() {
   const { t } = useTranslation();
   const { showError } = useNotifyModal();
 
-  // THÊM MỚI: Check role permission (STAFF role cannot see create button)
+  // Check role permission (STAFF role cannot see create/delete buttons)
   const roleName = useAppSelector((state) => state.auth.profile?.roleName);
   const isStaff = roleName === ROLES.STAFF;
 
@@ -69,6 +70,7 @@ export function DrinksPage() {
     handleSearch,
     handlePageChange,
     createDrink,
+    deleteDrink,
   } = useDrinks(1, 10);
 
   // Show error modal when user search returns no results
@@ -104,6 +106,25 @@ export function DrinksPage() {
     setDrawerOpen(true);
   };
 
+  // Open central delete confirmation modal matching the staff page style
+  const handleDeleteDrink = (g: GroupedDrink) => {
+    const targetId = g.id || g.variants[0]?.drinkId;
+    if (!targetId) return;
+
+    Modal.confirm({
+      title: t('table.deleteConfirmTitle') || 'Xác nhận xoá',
+      icon: <ExclamationCircleFilled style={{ color: '#faad14' }} />,
+      content: t('table.deleteConfirmDesc') || 'Bạn có chắc muốn xoá mục này không?',
+      okText: t('table.deleteOk') || 'Xoá',
+      okType: 'danger',
+      cancelText: t('table.deleteCancel') || 'Huỷ',
+      centered: true,
+      async onOk() {
+        await deleteDrink(targetId);
+      },
+    });
+  };
+
   // Get price for the currently selected size variant
   const priceForSelected = () => {
     if (!selected || !selectedVariantId) return '—';
@@ -127,7 +148,7 @@ export function DrinksPage() {
           />
         </div>
 
-        {/* ADD NEW: Create a new button in the right corner; hidden for the STAFF role. */}
+        {/* Create new button in the right corner; hidden for the STAFF role. */}
         {!isStaff && (
           <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateOpen(true)}>
             {t('form.create') || 'Tạo mới'}
@@ -145,7 +166,12 @@ export function DrinksPage() {
           <Row gutter={[16, 16]}>
             {grouped.map((g) => (
               <Col key={g.id ?? g.drinkName} xs={24} sm={12} md={8} lg={6}>
-                <DrinkCardGrouped record={g} onClick={() => onCardClick(g)} />
+                <DrinkCardGrouped
+                  record={g}
+                  onClick={() => onCardClick(g)}
+                  onDelete={handleDeleteDrink}
+                  isStaff={isStaff}
+                />
               </Col>
             ))}
           </Row>
@@ -195,7 +221,6 @@ export function DrinksPage() {
         onClose={() => setDrawerOpen(false)}
         width={520}
         title={selected?.drinkName}
-        // Nút Đóng cố định dưới footer chuẩn Ant Design
         footer={
           <div className="flex justify-end">
             <Button onClick={() => setDrawerOpen(false)}>{t('form.close') || 'Đóng'}</Button>

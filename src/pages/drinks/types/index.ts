@@ -49,3 +49,13 @@ export interface CreateDrinkResponse {
   message: string;
   traceId: string;
 }
+
+export interface DeleteDrinkRequest {
+  drinkId: string;
+}
+
+export interface DeleteDrinkResponse {
+  code: string;
+  message: string;
+  traceId: string;
+}

@@ -1,4 +1,3 @@
-// src/pages/drinks/api/drinksAPI.ts
 import { api } from '@/api/api';
 import { ENDPOINT } from '@/constants/endpoint';
 import type {
@@ -6,6 +5,8 @@ import type {
   GetDrinksRequest,
   CreateDrinkRequest,
   CreateDrinkResponse,
+  DeleteDrinkRequest,
+  DeleteDrinkResponse,
 } from '../types';
 
 export async function getDrinksApi(payload: GetDrinksRequest): Promise<DrinksResponse> {
@@ -15,5 +16,10 @@ export async function getDrinksApi(payload: GetDrinksRequest): Promise<DrinksRes
 
 export async function createDrinkApi(payload: CreateDrinkRequest): Promise<CreateDrinkResponse> {
   const response = await api.post<CreateDrinkResponse>(ENDPOINT.CREATE_DRINK, payload);
+  return response.data;
+}
+
+export async function deleteDrinkApi(payload: DeleteDrinkRequest): Promise<DeleteDrinkResponse> {
+  const response = await api.delete<DeleteDrinkResponse>(ENDPOINT.DELETE_DRINK, { data: payload });
   return response.data;
 }
