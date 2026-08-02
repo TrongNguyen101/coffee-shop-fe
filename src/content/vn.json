@@ -32,6 +32,20 @@
       "sizeRequired": "Vui lòng chọn kích cỡ!"
     }
   },
+  "categories": {
+    "title": "Danh Mục",
+    "name": "Tên danh mục",
+    "searchPlaceholder": "Tìm kiếm danh mục...",
+    "emptySearch": "Không tìm thấy danh mục nào phù hợp với từ khóa tìm kiếm.",
+    "createTitle": "Thêm danh mục",
+    "editTitle": "Chỉnh sửa danh mục",
+    "createSuccess": "Thêm danh mục thành công.",
+    "editSuccess": "Chỉnh sửa danh mục thành công.",
+    "deleteSuccess": "Xoá danh mục thành công.",
+    "nameRequired": "Vui lòng nhập tên danh mục.",
+    "shopRequired": "Vui lòng chọn chi nhánh.",
+    "nameConflict": "Tên danh mục đã tồn tại."
+  },
   "search": {
     "placeholder": "Tìm kiếm..."
   },
