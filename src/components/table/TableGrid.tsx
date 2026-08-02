@@ -138,27 +138,30 @@ export function TableGrid<T extends object>({
     } as TableColumnType<T>;
   });
 
-  // Auto-compute scrollX from column widths; fallback 150px per column without explicit width
-  const resolvedScrollX: number | string =
-    scrollX ??
-    allColumns.reduce((sum, col) => {
-      if (typeof col.width === 'number') return sum + col.width;
-      if (typeof col.width === 'string' && !Number.isNaN(Number(col.width)))
-        return sum + Number(col.width);
-      return sum + 150;
-    }, 0);
+  // 'max-content' lets the table fill the container and only triggers scroll when columns actually overflow
+  const resolvedScrollX: number | string = scrollX ?? 'max-content';
 
   const showCustomPagination = pagination === undefined && (total !== undefined || onPageChange);
 
   return (
-    <div className="table-grid-wrapper flex flex-col gap-2 w-full min-w-0">
+    <div className="table-grid-wrapper flex flex-col gap-2 w-full min-w-0 overflow-hidden">
       <Table<T>
         columns={processedColumns}
         dataSource={dataSource}
         loading={loading}
         rowKey={rowKey}
         pagination={pagination !== undefined ? pagination : false}
-        locale={{ emptyText: <Empty description={emptyText} /> }}
+        locale={{
+          emptyText: (
+            // min-height fills the scroll area (scroll.y minus table header ~55px)
+            <div
+              style={{ minHeight: 'calc(100vh - 390px)' }}
+              className="flex items-center justify-center"
+            >
+              <Empty description={emptyText} />
+            </div>
+          ),
+        }}
         scroll={{ x: resolvedScrollX, y: 'calc(100vh - 330px)' }}
         onRow={(record) => ({
           onClick: (e) => {

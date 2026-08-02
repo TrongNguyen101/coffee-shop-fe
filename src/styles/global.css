@@ -1,12 +1,40 @@
 @import 'tailwindcss';
 
-/* TableGrid: keep table body at full height even when rows are few */
-.table-grid-wrapper .ant-table-body {
-  min-height: calc(100vh - 330px);
+/* Move left border from the container (full-height artifact) to individual first cells */
+.table-grid-wrapper .ant-table-container {
+  border-inline-start: none !important;
+}
+.table-grid-wrapper .ant-table-cell:first-child {
+  border-inline-start: 1px solid #f0f0f0 !important;
 }
 
-@media (max-width: 768px) {
-  .table-grid-wrapper .ant-table-body {
-    min-height: 280px;
-  }
+/* Only show vertical scrollbar when content actually overflows */
+.table-grid-wrapper .ant-table-body {
+  overflow-y: auto !important;
+}
+
+/* Slim scrollbars for the table scroll areas */
+.table-grid-wrapper ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.table-grid-wrapper ::-webkit-scrollbar-track {
+  background: transparent;
+}
+.table-grid-wrapper ::-webkit-scrollbar-thumb {
+  background: #d9d9d9;
+  border-radius: 3px;
+}
+.table-grid-wrapper ::-webkit-scrollbar-thumb:hover {
+  background: #bfbfbf;
+}
+/* Shorten each scrollbar so they don't meet at the corner */
+.table-grid-wrapper ::-webkit-scrollbar-track:horizontal {
+  margin-right: 6px;
+}
+.table-grid-wrapper ::-webkit-scrollbar-track:vertical {
+  margin-bottom: 6px;
+}
+.table-grid-wrapper ::-webkit-scrollbar-corner {
+  background: transparent;
 }

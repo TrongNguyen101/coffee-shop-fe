@@ -46,9 +46,10 @@ export function useCategories() {
       if (isSearch) setSearchLoading(true);
       try {
         const response = await getCategoriesApi(currentParams);
-        setItems(response.items);
-        setPagination(response.pagination);
-        if (currentParams.search.trim() && response.items.length === 0) {
+        const fetchedItems = response.items ?? [];
+        setItems(fetchedItems);
+        setPagination(response.pagination ?? null);
+        if (currentParams.search.trim() && fetchedItems.length === 0) {
           setShowEmptyModal(true);
         }
       } finally {
