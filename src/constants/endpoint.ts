@@ -22,4 +22,7 @@ export const ENDPOINT = {
   GET_DRINKS: '/drinks',
   CREATE_DRINK: '/drink/create',
   DELETE_DRINK: '/drink/delete',
+
+  // Revenue
+  GET_REVENUES: '/revenues',
 } as const;
