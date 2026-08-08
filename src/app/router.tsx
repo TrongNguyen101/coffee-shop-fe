@@ -6,6 +6,7 @@ import { LoginPage } from '@/pages/login/LoginPage';
 import { DrinksPage } from '@/pages/drinks/DrinksPage';
 import { StaffsPage } from '@/pages/staffs/StaffsPage';
 import { CategoriesPage } from '@/pages/categories/CategoriesPage';
+import { RevenuesPage } from '@/pages/revenue/RevenuesPage';
 
 export const router = createHashRouter([
   // Public routes — login wrapped in AuthLayout
@@ -37,6 +38,10 @@ export const router = createHashRouter([
           {
             path: '/categories',
             element: <CategoriesPage />,
+          },
+          {
+            path: '/revenue',
+            element: <RevenuesPage />,
           },
         ],
       },
