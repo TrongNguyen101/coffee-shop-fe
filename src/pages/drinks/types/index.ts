@@ -1,12 +1,17 @@
+export interface DrinkVariantItem {
+  drinkId?: string;
+  size: string;
+  price: string;
+}
+
 export interface DrinkItem {
   drinkCategoryId: string;
   drinkId: string;
   drinkName: string;
   imageUrl?: string | null;
   isDeleted: boolean;
-  price: string;
-  size: string;
   status: string;
+  variants: DrinkVariantItem[];
 }
 
 export interface DrinksPagination {
