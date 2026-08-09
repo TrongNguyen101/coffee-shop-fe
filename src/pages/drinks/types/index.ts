@@ -7,6 +7,7 @@ export interface DrinkVariantItem {
 export interface DrinkItem {
   drinkCategoryId: string;
   drinkId: string;
+  shopId: string;
   drinkName: string;
   imageUrl?: string | null;
   isDeleted: boolean;
@@ -39,6 +40,7 @@ export interface GetDrinkDetailResponse {
 export interface GetDrinksRequest {
   page: number;
   size: number;
+  branchShopId: string;
   search?: string;
   sortBy?: string;
   sortDirection?: 'ASC' | 'DESC';

@@ -10,18 +10,23 @@ interface Props {
 }
 
 export function DrinkCardGrouped({ record, onClick, onDelete, isStaff = false }: Props) {
-  const fallbackImage = 'https://placehold.co/400x400?text=No+Image';
+  const fallbackImage = 'https://placehold.co/400x300?text=No+Image';
 
   return (
     <Card
       hoverable
       onClick={() => onClick?.(record)}
+      className="drink-card group transition-all duration-200 hover:shadow-md"
       cover={
-        <div className="w-full aspect-[4/3] overflow-hidden bg-gray-50 rounded-t-lg">
+        <div
+          className="w-full aspect-[4/3] overflow-hidden bg-gray-50 relative"
+          style={{ borderTopLeftRadius: 12, borderTopRightRadius: 12 }}
+        >
           <img
-            alt="cover"
+            alt={record.drinkName}
             src={record.imageUrl || fallbackImage}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            style={{ borderTopLeftRadius: 12, borderTopRightRadius: 12 }}
             onError={(e) => {
               const el = e.currentTarget as HTMLImageElement;
               if (el.src !== fallbackImage) {
@@ -31,37 +36,42 @@ export function DrinkCardGrouped({ record, onClick, onDelete, isStaff = false }:
           />
         </div>
       }
-      styles={{ body: { padding: '8px 10px' } }}
+      styles={{
+        body: {
+          padding: '10px 12px',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          minHeight: '76px',
+        },
+      }}
       style={{
         width: '100%',
-        border: '1px solid rgba(0,0,0,0.06)',
+        borderRadius: 12,
+        overflow: 'hidden',
+        border: '1px solid #f0f0f0',
         background: '#fff',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
       }}
     >
-      <div className="flex flex-col justify-between gap-2">
-        {/* Drink Name */}
-        <div>
-          <Typography.Paragraph
-            ellipsis={{ rows: 2 }}
-            className="mb-0! text-xs font-semibold leading-snug text-gray-800"
-            title={record.drinkName}
-          >
-            {record.drinkName}
-          </Typography.Paragraph>
-        </div>
+      {/* Information below the image. */}
+      <div className="flex flex-col justify-between h-full gap-1">
+        <Typography.Paragraph
+          ellipsis={{ rows: 2, expandable: false }}
+          className="mb-0! text-sm font-semibold text-gray-800 leading-snug"
+          title={record.drinkName}
+        >
+          {record.drinkName}
+        </Typography.Paragraph>
 
         {!isStaff && onDelete && (
-          <div className="flex items-center justify-end mt-1">
+          <div className="flex items-center justify-end">
             <Button
               danger
               type="text"
               shape="circle"
               size="small"
-              className="flex items-center justify-center min-w-[24px] w-6 h-6"
-              icon={<DeleteOutlined style={{ fontSize: 13 }} />}
+              className="flex items-center justify-center opacity-70 group-hover:opacity-100 hover:bg-red-50"
+              icon={<DeleteOutlined style={{ fontSize: 14 }} />}
               onClick={(e) => {
                 e.stopPropagation();
                 onDelete(record);
