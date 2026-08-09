@@ -1,9 +1,7 @@
 import { Card, Typography, Button } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
-import { useTranslation } from 'react-i18next';
 import type { DrinkItem } from '../types';
 
-// Component props interface
 interface Props {
   record: DrinkItem;
   onClick?: (record: DrinkItem) => void;
@@ -11,22 +9,7 @@ interface Props {
   isStaff?: boolean;
 }
 
-// Component to display drink card with starting price
 export function DrinkCardGrouped({ record, onClick, onDelete, isStaff = false }: Props) {
-  const { t } = useTranslation();
-
-  // Calculate lowest price among available size variants
-  const lowest = record.variants?.reduce((acc, v) => {
-    const num = Number(String(v.price).replace(/[^0-9.-]+/g, '')) || 0;
-    return acc === 0 || num < acc ? num : acc;
-  }, 0);
-
-  // Format display price text
-  const priceText = lowest
-    ? `${t('common.from')} ${lowest.toLocaleString('vi-VN')}đ`
-    : (record.variants?.[0]?.price ?? '—');
-
-  // Fallback image URL when drink image fails to load or is null
   const fallbackImage = 'https://placehold.co/400x400?text=No+Image';
 
   return (
@@ -34,7 +17,6 @@ export function DrinkCardGrouped({ record, onClick, onDelete, isStaff = false }:
       hoverable
       onClick={() => onClick?.(record)}
       cover={
-        /* Square aspect ratio image container */
         <div className="w-full aspect-[4/3] overflow-hidden bg-gray-50 rounded-t-lg">
           <img
             alt="cover"
@@ -60,7 +42,7 @@ export function DrinkCardGrouped({ record, onClick, onDelete, isStaff = false }:
       }}
     >
       <div className="flex flex-col justify-between gap-2">
-        {/* Drink Name Display Row - Full text wrapping up to 2 lines */}
+        {/* Drink Name */}
         <div>
           <Typography.Paragraph
             ellipsis={{ rows: 2 }}
@@ -71,14 +53,8 @@ export function DrinkCardGrouped({ record, onClick, onDelete, isStaff = false }:
           </Typography.Paragraph>
         </div>
 
-        {/* Bottom Price & Delete Button Row */}
-        <div className="flex items-end justify-between gap-1 mt-1">
-          <div>
-            <span className="text-green-600 font-semibold text-xs">{priceText}</span>
-          </div>
-
-          {/* Delete Button */}
-          {!isStaff && onDelete && (
+        {!isStaff && onDelete && (
+          <div className="flex items-center justify-end mt-1">
             <Button
               danger
               type="text"
@@ -91,8 +67,8 @@ export function DrinkCardGrouped({ record, onClick, onDelete, isStaff = false }:
                 onDelete(record);
               }}
             />
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </Card>
   );

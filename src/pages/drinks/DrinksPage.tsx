@@ -18,6 +18,7 @@ import { useNotifyModal } from '@/components/modal/NotifyModal';
 import { useAppSelector } from '@/store/hooks';
 import { ROLES } from '@/permission/roles';
 import { useDrinks } from './hooks/useDrinks';
+import { getDrinkDetailApi } from './api/drinksAPI';
 import type { DrinkItem } from './types';
 import { DrinkCardGrouped } from './components/DrinkCardGrouped';
 import { DrinkCreateModal } from './components/DrinkCreateModal';
@@ -37,10 +38,10 @@ export function DrinksPage() {
     loading,
     searchLoading,
     createLoading,
-    currentPage,
-    currentPageSize,
     showEmptyModal,
     closeEmptyModal,
+    currentPage,
+    currentPageSize,
     handleSearch,
     handlePageChange,
     createDrink,
@@ -57,20 +58,33 @@ export function DrinksPage() {
 
   // Drawer and variant selection states
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [detailLoading, setDetailLoading] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
   const [selected, setSelected] = useState<DrinkItem | null>(null);
   const [selectedVariantIndex, setSelectedVariantIndex] = useState<number>(0);
 
   const fallbackImage = 'https://placehold.co/600x400?text=No+Image';
 
-  // Open detail drawer and select the first size variant by default
-  const onCardClick = (g: DrinkItem) => {
+  // Open detail drawer and fetch detailed drink info including size variants
+  const onCardClick = async (g: DrinkItem) => {
     setSelected(g);
     setSelectedVariantIndex(0);
     setDrawerOpen(true);
+    setDetailLoading(true);
+
+    try {
+      const res = await getDrinkDetailApi(g.drinkId);
+      if (res?.item) {
+        setSelected(res.item);
+      }
+    } catch (err) {
+      console.error('Failed to fetch drink detail:', err);
+    } finally {
+      setDetailLoading(false);
+    }
   };
 
-  // Open central delete confirmation modal matching the staff page style
+  // Open central delete confirmation modal
   const handleDeleteDrink = (g: DrinkItem) => {
     const targetId = g.drinkId;
     if (!targetId) return;
@@ -127,7 +141,7 @@ export function DrinksPage() {
         )}
       </div>
 
-      {/* Scrollable card container with fixed height to prevent layout shift during pagination */}
+      {/* Scrollable card container with fixed height */}
       <div className="w-full border border-gray-200 rounded-lg p-3 h-[calc(100vh-295px)] min-h-[460px] overflow-y-auto bg-gray-50/30">
         <Spin
           spinning={loading}
@@ -194,78 +208,82 @@ export function DrinksPage() {
           </div>
         }
       >
-        {selected && (
-          <div className="flex flex-col gap-4">
-            {/* Drink Image */}
-            <div className="w-full aspect-[4/3] bg-gray-50 rounded-lg overflow-hidden flex items-center justify-center border border-gray-100">
-              <img
-                src={selected.imageUrl || fallbackImage}
-                alt="drink"
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  const el = e.currentTarget as HTMLImageElement;
-                  if (el.src !== fallbackImage) {
-                    el.src = fallbackImage;
-                  }
-                }}
-              />
-            </div>
-
-            {/* Drink Title & Size Badge */}
-            <div className="flex items-center gap-2 flex-wrap">
-              <Typography.Title level={4} className="mb-0!">
-                {selected.drinkName}
-              </Typography.Title>
-              {selected?.variants?.length && (
-                <Tag color="green">{selected.variants.length} size</Tag>
-              )}
-            </div>
-
-            {/* Variant Selector */}
-            <div>
-              <Typography.Text strong>{t('drinks.chooseSize')}</Typography.Text>
-              <div className="mt-2 w-full overflow-x-auto">
-                <Radio.Group
-                  value={selectedVariantIndex}
-                  onChange={(e) => setSelectedVariantIndex(Number(e.target.value))}
-                  buttonStyle="solid"
-                  className="flex flex-wrap gap-2"
-                >
-                  {selected.variants?.map((v, idx) => (
-                    <Radio.Button key={v.drinkId || idx} value={idx}>
-                      {v.size.trim()} - {formatCurrency(v.price)}
-                    </Radio.Button>
-                  ))}
-                </Radio.Group>
+        <Spin spinning={detailLoading}>
+          {selected && (
+            <div className="flex flex-col gap-4">
+              {/* Image */}
+              <div className="w-full aspect-[4/3] bg-gray-50 rounded-lg overflow-hidden flex items-center justify-center border border-gray-100">
+                <img
+                  src={selected.imageUrl || fallbackImage}
+                  alt="drink"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    const el = e.currentTarget as HTMLImageElement;
+                    if (el.src !== fallbackImage) {
+                      el.src = fallbackImage;
+                    }
+                  }}
+                />
               </div>
-            </div>
 
-            {/* Price and Status Row */}
-            <div className="flex items-center justify-between gap-4 pt-3 border-t border-gray-100">
-              <div>
-                <div className="text-sm text-gray-500">{t('drinks.price')}</div>
+              {/* Title and total sizes badge */}
+              <div className="flex items-center gap-2 flex-wrap">
+                <Typography.Title level={4} className="mb-0!">
+                  {selected.drinkName}
+                </Typography.Title>
+                {selected?.variants && selected.variants.length > 0 && (
+                  <Tag color="green">{selected.variants.length} size</Tag>
+                )}
+              </div>
 
-                <div className="text-xl font-bold text-green-600">
-                  {formatCurrency(priceForSelected())}
+              {/* Variant selector displaying size and price */}
+              {selected?.variants && selected.variants.length > 0 && (
+                <div>
+                  <Typography.Text strong>{t('drinks.chooseSize')}</Typography.Text>
+                  <div className="mt-2 w-full overflow-x-auto">
+                    <Radio.Group
+                      value={selectedVariantIndex}
+                      onChange={(e) => setSelectedVariantIndex(Number(e.target.value))}
+                      buttonStyle="solid"
+                      className="flex flex-wrap gap-2"
+                    >
+                      {selected.variants.map((v, idx) => (
+                        <Radio.Button key={v.drinkId || idx} value={idx}>
+                          {v.size.trim()} - {formatCurrency(v.price)}
+                        </Radio.Button>
+                      ))}
+                    </Radio.Group>
+                  </div>
+                </div>
+              )}
+
+              {/* Price for selected size and status */}
+              <div className="flex items-center justify-between gap-4 pt-3 border-t border-gray-100">
+                <div>
+                  <div className="text-sm text-gray-500">{t('drinks.price')}</div>
+                  <div className="text-xl font-bold text-green-600">
+                    {formatCurrency(priceForSelected())}
+                  </div>
+                </div>
+
+                <div className="text-right">
+                  <div className="text-sm text-gray-500">{t('drinks.status')}</div>
+                  <Tag
+                    color={
+                      selected?.status === 'Đang bán' ||
+                      selected?.status === t('drinks.statusActive')
+                        ? 'green'
+                        : 'default'
+                    }
+                    className="mt-1 mr-0"
+                  >
+                    {selected?.status ?? '—'}
+                  </Tag>
                 </div>
               </div>
-
-              <div className="text-right">
-                <div className="text-sm text-gray-500">{t('drinks.status')}</div>
-                <Tag
-                  color={
-                    selected?.status === 'Đang bán' || selected?.status === t('drinks.statusActive')
-                      ? 'green'
-                      : 'default'
-                  }
-                  className="mt-1 mr-0"
-                >
-                  {selected?.status ?? '—'}
-                </Tag>
-              </div>
             </div>
-          </div>
-        )}
+          )}
+        </Spin>
       </Drawer>
 
       {/* Create drink Modal */}

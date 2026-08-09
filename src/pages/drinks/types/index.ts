@@ -1,7 +1,7 @@
 export interface DrinkVariantItem {
   drinkId?: string;
   size: string;
-  price: string;
+  price: number | string;
 }
 
 export interface DrinkItem {
@@ -11,7 +11,7 @@ export interface DrinkItem {
   imageUrl?: string | null;
   isDeleted: boolean;
   status: string;
-  variants: DrinkVariantItem[];
+  variants: DrinkVariantItem[] | null;
 }
 
 export interface DrinksPagination {
@@ -27,6 +27,13 @@ export interface DrinksResponse {
   traceId: string;
   items: DrinkItem[];
   pagination: DrinksPagination;
+}
+
+export interface GetDrinkDetailResponse {
+  code: string;
+  message: string;
+  traceId: string;
+  item: DrinkItem;
 }
 
 export interface GetDrinksRequest {
