@@ -20,8 +20,10 @@ export const ENDPOINT = {
 
   // Drinks
   GET_DRINKS: '/drinks',
+  GET_DRINK_DETAIL: '/drink/detail',
   CREATE_DRINK: '/drink/create',
   DELETE_DRINK: '/drink/delete',
+  UPDATE_DRINK: '/drink/edit',
 
   // Revenue
   GET_REVENUES: '/revenues',
