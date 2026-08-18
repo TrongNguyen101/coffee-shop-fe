@@ -27,4 +27,7 @@ export const ENDPOINT = {
 
   // Revenue
   GET_REVENUES: '/revenues',
+
+  // Shop branch
+  GET_SHOP_BRANCHES: 'shop-branches',
 } as const;
