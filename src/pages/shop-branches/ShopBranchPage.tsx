@@ -8,9 +8,10 @@ import { useNotifyModal } from '@/components/modal/NotifyModal';
 import { useConfirmModal } from '@/components/modal/ConfirmModal';
 import { AppFormDrawer, type FormFieldConfig } from '@/components/form/AppFormDrawer';
 import { useShopBranch } from './hooks/useShopBranch';
-import { createShopBranchApi } from './api/shopBranchAPI';
+import { createShopBranchApi, editShopBranchApi } from './api/shopBranchAPI';
 import { ShopBranchCreateModal } from './components/ShopBranchCreateModal';
-import type { ShopBranchItem, CreateShopBranchRequest } from './types';
+import { ShopBranchEditModal } from './components/ShopBranchEditModal';
+import type { ShopBranchItem, CreateShopBranchRequest, EditShopBranchRequest } from './types';
 
 // Format datetime values to Vietnamese locale string
 const formatDate = (value: unknown) =>
@@ -49,6 +50,10 @@ export function ShopBranchPage() {
   const [detailOpen, setDetailOpen] = useState(false);
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [createLoading, setCreateLoading] = useState(false);
+
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editLoading, setEditLoading] = useState(false);
+
   const [selectedRecord, setSelectedRecord] = useState<ShopBranchItem | null>(null);
 
   // Trigger error notification modal when search query yields no results
@@ -131,11 +136,25 @@ export function ShopBranchPage() {
   // Handle edit action on table row
   const handleEditClick = (record: ShopBranchItem) => {
     setSelectedRecord(record);
-    // TODO: Open ShopBranchEditModal once created
-    console.log('Open edit modal for:', record.shopId);
+    setEditModalOpen(true);
   };
 
-  // Handle delete confirmation modal
+  const handleEditSubmit = async (values: EditShopBranchRequest) => {
+    setEditLoading(true);
+    try {
+      await editShopBranchApi(values);
+      notification.success({
+        message: t('shopBranches.editSuccess'),
+        placement: 'topRight',
+        duration: 3,
+      });
+      refresh();
+      setEditModalOpen(false);
+    } finally {
+      setEditLoading(false);
+    }
+  };
+
   const handleDeleteClick = (record: ShopBranchItem) => {
     confirmDelete({
       title: t('table.deleteConfirmTitle'),
@@ -204,6 +223,14 @@ export function ShopBranchPage() {
         loading={createLoading}
         onClose={() => setCreateModalOpen(false)}
         onSubmit={handleCreateSubmit}
+      />
+
+      <ShopBranchEditModal
+        open={editModalOpen}
+        loading={editLoading}
+        record={selectedRecord}
+        onClose={() => setEditModalOpen(false)}
+        onSubmit={handleEditSubmit}
       />
     </div>
   );

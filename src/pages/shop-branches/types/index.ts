@@ -38,3 +38,11 @@ export interface CreateShopBranchRequest {
   address: string;
   phoneNumber: string;
 }
+
+export interface EditShopBranchRequest {
+  shopId: string;
+  shopName: string;
+  address: string;
+  phoneNumber: string;
+  isDeleted?: boolean;
+}

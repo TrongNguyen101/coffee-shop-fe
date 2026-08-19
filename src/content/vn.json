@@ -104,7 +104,9 @@
     "phoneNumberPlaceholder": "Nhập số điện thoại...",
     "addressPlaceholder": "Nhập địa chỉ...",
     "phoneInvalid": "Số điện thoại chứa 10-11 chữ số.",
-    "phoneMax": "Số điện thoại tối đa 11 số."
+    "phoneMax": "Số điện thoại tối đa 11 số.",
+    "editTitle": "Chỉnh sửa chi nhánh",
+    "editSuccess": "Cập nhật chi nhánh thành công."
   },
   "search": {
     "placeholder": "Tìm kiếm..."
