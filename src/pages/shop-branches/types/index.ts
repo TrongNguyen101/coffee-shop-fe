@@ -32,3 +32,9 @@ export interface ShopBranchesResponse {
   items: ShopBranchItem[];
   pagination: ShopBranchPagination;
 }
+
+export interface CreateShopBranchRequest {
+  shopName: string;
+  address: string;
+  phoneNumber: string;
+}
