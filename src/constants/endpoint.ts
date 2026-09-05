@@ -27,4 +27,17 @@ export const ENDPOINT = {
 
   // Revenue
   GET_REVENUES: '/revenues',
+
+  // Invoices
+  GET_INVOICES: '/invoices',
+  CREATE_INVOICE: '/invoice/create',
+  EDIT_INVOICE: '/invoice/edit',
+  PAY_INVOICE: '/invoice/pay',
+  CANCEL_INVOICE: '/invoice/cancel',
+
+  // Shop branch
+  GET_SHOP_BRANCHES: 'shop-branches',
+  CREATE_SHOP_BRANCH: 'shop-branch/create',
+  EDIT_SHOP_BRANCH: '/shop-branch/edit',
+  DELETE_SHOP_BRANCH: '/shop-branch/delete',
 } as const;
