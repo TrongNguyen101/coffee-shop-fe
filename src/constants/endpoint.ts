@@ -34,4 +34,10 @@ export const ENDPOINT = {
   EDIT_INVOICE: '/invoice/edit',
   PAY_INVOICE: '/invoice/pay',
   CANCEL_INVOICE: '/invoice/cancel',
+
+  // Shop branch
+  GET_SHOP_BRANCHES: 'shop-branches',
+  CREATE_SHOP_BRANCH: 'shop-branch/create',
+  EDIT_SHOP_BRANCH: '/shop-branch/edit',
+  DELETE_SHOP_BRANCH: '/shop-branch/delete',
 } as const;
