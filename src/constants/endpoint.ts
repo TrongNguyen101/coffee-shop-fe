@@ -27,4 +27,11 @@ export const ENDPOINT = {
 
   // Revenue
   GET_REVENUES: '/revenues',
+
+  // Invoices
+  GET_INVOICES: '/invoices',
+  CREATE_INVOICE: '/invoice/create',
+  EDIT_INVOICE: '/invoice/edit',
+  PAY_INVOICE: '/invoice/pay',
+  CANCEL_INVOICE: '/invoice/cancel',
 } as const;
