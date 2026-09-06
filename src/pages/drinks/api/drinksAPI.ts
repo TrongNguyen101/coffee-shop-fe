@@ -9,6 +9,8 @@ import type {
   DeleteDrinkRequest,
   DeleteDrinkResponse,
   CategoryDropdownResponse,
+  EditDrinkRequest,
+  EditDrinkResponse,
 } from '../types';
 
 export async function getDrinksApi(payload: GetDrinksRequest): Promise<DrinksResponse> {
@@ -47,5 +49,23 @@ export async function deleteDrinkApi(payload: DeleteDrinkRequest): Promise<Delet
 
 export async function getDropdownCategoriesApi(): Promise<CategoryDropdownResponse> {
   const response = await api.get<CategoryDropdownResponse>(ENDPOINT.GET_DROPDOWN_CATEGORIES);
+  return response.data;
+}
+
+export async function editDrinkApi(
+  payload: EditDrinkRequest,
+  imageFile?: File,
+): Promise<EditDrinkResponse> {
+  const formData = new FormData();
+  formData.append('data', new Blob([JSON.stringify(payload)], { type: 'application/json' }));
+  if (imageFile) {
+    formData.append('image', imageFile);
+  }
+
+  const response = await api.put<EditDrinkResponse>(ENDPOINT.UPDATE_DRINK, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
   return response.data;
 }

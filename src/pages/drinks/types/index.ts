@@ -93,3 +93,21 @@ export interface CategorySelectOption {
   label: string; // shopName - categoryName
   shopId: string;
 }
+
+export interface EditDrinkRequest {
+  drinkId: string;
+  drinkName: string;
+  imageUrl?: string;
+  status: number;
+  isDeleted: boolean;
+  price: number;
+  size: string;
+  shopId: string;
+  drinkCategoryId: string;
+}
+
+export interface EditDrinkResponse {
+  code: string;
+  message: string;
+  traceId: string;
+}

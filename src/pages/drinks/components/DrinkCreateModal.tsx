@@ -99,7 +99,6 @@ export function DrinkCreateModal({
         setFileList([]);
         onClose();
       }}
-      destroyOnClose
     >
       <Form form={form} layout="vertical">
         {/* Drink Name Field */}

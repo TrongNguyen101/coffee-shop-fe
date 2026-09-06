@@ -4,6 +4,7 @@ import { useToast } from '@/components/toast/useToast';
 import {
   getDrinksApi,
   createDrinkApi,
+  editDrinkApi,
   deleteDrinkApi,
   getDropdownCategoriesApi,
 } from '../api/drinksAPI';
@@ -12,6 +13,7 @@ import type {
   DrinkItem,
   GetDrinksRequest,
   CreateDrinkRequest,
+  EditDrinkRequest,
   CategorySelectOption,
 } from '../types';
 import type { ShopNameItem } from '@/pages/staffs/types';
@@ -48,6 +50,7 @@ export function useDrinks(initialPage = 1, initialSize = 10) {
   const [loading, setLoading] = useState(false);
   const [searchLoading, setSearchLoading] = useState(false);
   const [createLoading, setCreateLoading] = useState(false);
+  const [editLoading, setEditLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [optionsLoading, setOptionsLoading] = useState(false);
   const [showEmptyModal, setShowEmptyModal] = useState(false);
@@ -93,7 +96,7 @@ export function useDrinks(initialPage = 1, initialSize = 10) {
     [],
   );
 
-  // Fetch shop list and category options
+  // Fetch shop list and categories for dropdown selections
   useEffect(() => {
     async function fetchOptions() {
       setOptionsLoading(true);
@@ -151,6 +154,24 @@ export function useDrinks(initialPage = 1, initialSize = 10) {
         throw error;
       } finally {
         setCreateLoading(false);
+      }
+    },
+    [params, fetchDrinks, toast, t],
+  );
+
+  // Handler for editing an existing drink
+  const editDrink = useCallback(
+    async (values: EditDrinkRequest, imageFile?: File) => {
+      setEditLoading(true);
+      try {
+        await editDrinkApi(values, imageFile);
+        toast.success(t('drinks.editSuccess'));
+        await fetchDrinks(params);
+      } catch (error) {
+        console.error('Failed to edit drink:', error);
+        throw error;
+      } finally {
+        setEditLoading(false);
       }
     },
     [params, fetchDrinks, toast, t],
@@ -220,6 +241,7 @@ export function useDrinks(initialPage = 1, initialSize = 10) {
     loading,
     searchLoading,
     createLoading,
+    editLoading,
     deleteLoading,
     optionsLoading,
     shopOptions,
@@ -230,6 +252,7 @@ export function useDrinks(initialPage = 1, initialSize = 10) {
     handleShopFilter,
     handlePageChange,
     createDrink,
+    editDrink,
     deleteDrink,
     refresh: () => fetchDrinks(params, false),
   };

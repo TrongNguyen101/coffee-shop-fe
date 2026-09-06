@@ -11,6 +11,7 @@ import { getDrinkDetailApi } from './api/drinksAPI';
 import type { DrinkItem } from './types';
 import { DrinkCardGrouped } from './components/DrinkCardGrouped';
 import { DrinkCreateModal } from './components/DrinkCreateModal';
+import { DrinkEditModal } from './components/DrinkEditModal';
 import { DrinkDetailDrawer } from './components/DrinkDetailDrawer';
 
 export function DrinksPage() {
@@ -29,6 +30,7 @@ export function DrinksPage() {
     loading,
     searchLoading,
     createLoading,
+    editLoading,
     showEmptyModal,
     closeEmptyModal,
     currentPage,
@@ -41,6 +43,7 @@ export function DrinksPage() {
     handleShopFilter,
     handlePageChange,
     createDrink,
+    editDrink,
     deleteDrink,
   } = useDrinks(1, 10);
 
@@ -56,7 +59,9 @@ export function DrinksPage() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [detailLoading, setDetailLoading] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
   const [selected, setSelected] = useState<DrinkItem | null>(null);
+  const [selectedEditRecord, setSelectedEditRecord] = useState<DrinkItem | null>(null);
   const [selectedVariantIndex, setSelectedVariantIndex] = useState<number>(0);
 
   // Open detail drawer and fetch variants
@@ -76,6 +81,12 @@ export function DrinksPage() {
     } finally {
       setDetailLoading(false);
     }
+  };
+
+  // Trigger edit modal opening
+  const handleOpenEdit = (record: DrinkItem) => {
+    setSelectedEditRecord(record);
+    setEditOpen(true);
   };
 
   // Confirm soft deletion
@@ -153,6 +164,7 @@ export function DrinksPage() {
                 record={g}
                 onClick={() => onCardClick(g)}
                 onDelete={handleDeleteDrink}
+                onEdit={handleOpenEdit}
                 isStaff={isStaff}
               />
             ))}
@@ -204,6 +216,16 @@ export function DrinksPage() {
         onClose={() => setCreateOpen(false)}
         onSubmit={createDrink}
         loading={createLoading}
+        categoryOptions={categoryOptions}
+      />
+
+      {/* Edit Drink Modal */}
+      <DrinkEditModal
+        open={editOpen}
+        onClose={() => setEditOpen(false)}
+        record={selectedEditRecord}
+        onSubmit={editDrink}
+        loading={editLoading}
         categoryOptions={categoryOptions}
       />
     </div>

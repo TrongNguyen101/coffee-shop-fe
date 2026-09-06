@@ -69,10 +69,11 @@
     "emptySearch": "Không tìm thấy đồ uống nào phù hợp với từ khóa tìm kiếm.",
     "uploadImage": "Tải ảnh lên",
     "noCategory": "Chưa có dữ liệu danh mục",
-    "imageTooLong": "Đường dẫn hình ảnh quá dài (tối đa 500 ký tự). Vui lòng chọn ảnh có dung lượng nhỏ hơn hoặc sử dụng đường dẫn ngắn hơn!",
     "statusActive": "Đang bán",
     "statusInactive": "Ngừng bán",
     "createSuccess": "Thêm đồ uống thành công!",
+    "editSuccess": "Chỉnh sửa đồ uống thành công!",
+    "editError": "Chỉnh sửa đồ uống thất bại!",
     "deleteSuccess": "Xoá đồ uống thành công!",
     "deleteError": "Xoá đồ uống thất bại!",
     "sizeOptions": {
