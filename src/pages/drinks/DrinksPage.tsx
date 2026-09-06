@@ -35,6 +35,7 @@ export function DrinksPage() {
     currentPageSize,
     currentBranchShopId,
     shopOptions,
+    categoryOptions,
     optionsLoading,
     handleSearch,
     handleShopFilter,
@@ -203,6 +204,7 @@ export function DrinksPage() {
         onClose={() => setCreateOpen(false)}
         onSubmit={createDrink}
         loading={createLoading}
+        categoryOptions={categoryOptions}
       />
     </div>
   );

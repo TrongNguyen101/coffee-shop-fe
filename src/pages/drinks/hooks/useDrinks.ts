@@ -1,9 +1,19 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/components/toast/useToast';
-import { getDrinksApi, createDrinkApi, deleteDrinkApi } from '../api/drinksAPI';
+import {
+  getDrinksApi,
+  createDrinkApi,
+  deleteDrinkApi,
+  getDropdownCategoriesApi,
+} from '../api/drinksAPI';
 import { getShopNamesApi } from '@/pages/staffs/api/staffsApi';
-import type { DrinkItem, GetDrinksRequest, CreateDrinkRequest } from '../types';
+import type {
+  DrinkItem,
+  GetDrinksRequest,
+  CreateDrinkRequest,
+  CategorySelectOption,
+} from '../types';
 import type { ShopNameItem } from '@/pages/staffs/types';
 
 // Default pagination, search, and shop filter parameters
@@ -32,6 +42,7 @@ export function useDrinks(initialPage = 1, initialSize = 10) {
   const [items, setItems] = useState<DrinkItem[]>([]);
   const [totalElements, setTotalElements] = useState<number>(0);
   const [shopNames, setShopNames] = useState<ShopNameItem[]>([]);
+  const [categoryOptions, setCategoryOptions] = useState<CategorySelectOption[]>([]);
 
   // UI loading and status states
   const [loading, setLoading] = useState(false);
@@ -82,15 +93,27 @@ export function useDrinks(initialPage = 1, initialSize = 10) {
     [],
   );
 
-  // Fetch shop list for the OWNER filter dropdown
+  // Fetch shop list and category options
   useEffect(() => {
     async function fetchOptions() {
       setOptionsLoading(true);
       try {
-        const shopNamesRes = await getShopNamesApi();
+        const [shopNamesRes, categoriesRes] = await Promise.all([
+          getShopNamesApi(),
+          getDropdownCategoriesApi(),
+        ]);
         setShopNames(shopNamesRes.shopNameResults || []);
+
+        const mappedCategories: CategorySelectOption[] = (categoriesRes.categoryResult || []).map(
+          (cat) => ({
+            value: cat.categoryId,
+            label: `${cat.shopName} - ${cat.categoryName}`,
+            shopId: cat.shopId,
+          }),
+        );
+        setCategoryOptions(mappedCategories);
       } catch (err) {
-        console.error('Failed to fetch shop options:', err);
+        console.error('Failed to fetch dropdown options:', err);
       } finally {
         setOptionsLoading(false);
       }
@@ -117,10 +140,10 @@ export function useDrinks(initialPage = 1, initialSize = 10) {
 
   // Handler for creating a new drink
   const createDrink = useCallback(
-    async (values: CreateDrinkRequest) => {
+    async (values: CreateDrinkRequest, imageFile?: File) => {
       setCreateLoading(true);
       try {
-        await createDrinkApi(values);
+        await createDrinkApi(values, imageFile);
         toast.success(t('drinks.createSuccess'));
         await fetchDrinks(params);
       } catch (error) {
@@ -200,6 +223,7 @@ export function useDrinks(initialPage = 1, initialSize = 10) {
     deleteLoading,
     optionsLoading,
     shopOptions,
+    categoryOptions,
     showEmptyModal,
     closeEmptyModal: () => setShowEmptyModal(false),
     handleSearch,

@@ -73,3 +73,23 @@ export interface DeleteDrinkResponse {
   message: string;
   traceId: string;
 }
+
+export interface CategoryDropdownItem {
+  categoryId: string;
+  categoryName: string;
+  shopId: string;
+  shopName: string;
+}
+
+export interface CategoryDropdownResponse {
+  code: string;
+  message: string;
+  traceId: string;
+  categoryResult: CategoryDropdownItem[];
+}
+
+export interface CategorySelectOption {
+  value: string; // categoryId
+  label: string; // shopName - categoryName
+  shopId: string;
+}
