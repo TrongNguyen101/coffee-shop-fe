@@ -2,7 +2,7 @@ export interface ShopBranchItem {
   shopId: string;
   shopName: string;
   address: string;
-  phoneNumber: string;
+  phoneNumber: string | null;
   createdAt: string;
   updatedAt: string;
   isDeleted: boolean;
@@ -36,15 +36,14 @@ export interface ShopBranchesResponse {
 export interface CreateShopBranchRequest {
   shopName: string;
   address: string;
-  phoneNumber: string;
+  phoneNumber: string | null;
 }
 
 export interface EditShopBranchRequest {
   shopId: string;
   shopName: string;
   address: string;
-  phoneNumber: string;
-  isDeleted?: boolean;
+  phoneNumber: string | null;
 }
 
 export interface DeleteShopBranchRequest {

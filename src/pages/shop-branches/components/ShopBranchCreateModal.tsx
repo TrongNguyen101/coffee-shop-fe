@@ -31,7 +31,14 @@ export function ShopBranchCreateModal({
   // Handle form submission and conflict error handling
   const handleSubmit = async (values: ShopBranchCreateValues) => {
     try {
-      await onSubmit(values);
+      const payload: ShopBranchCreateValues = {
+        ...values,
+        shopName: values.shopName?.trim(),
+        address: values.address?.trim(),
+        phoneNumber: values.phoneNumber?.trim() ? values.phoneNumber.trim() : null,
+      };
+
+      await onSubmit(payload);
       handleClose();
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.data) {
@@ -106,7 +113,14 @@ export function ShopBranchCreateModal({
           <Form.Item
             name="shopName"
             label={t('shopBranches.shopName')}
-            rules={[{ required: true, message: t('shopBranches.nameRequired') }]}
+            rules={[
+              { required: true, whitespace: true, message: t('responses.EV001') },
+              { max: 100, message: t('responses.EV005') },
+              {
+                pattern: /^[\p{L}0-9\s.,&'-]+$/u,
+                message: t('responses.EV007'),
+              },
+            ]}
           >
             <Input placeholder={t('shopBranches.shopNamePlaceholder')} />
           </Form.Item>
@@ -114,20 +128,40 @@ export function ShopBranchCreateModal({
           <Form.Item
             name="phoneNumber"
             label={t('shopBranches.phoneNumber')}
-            normalize={(value: string) => value.replace(/\D/g, '').slice(0, 11)}
+            normalize={(value: string) => (value ? value.replace(/\D/g, '').slice(0, 11) : '')}
             rules={[
-              { required: true, message: t('shopBranches.phoneRequired') },
-              { min: 10, message: t('shopBranches.phoneInvalid') },
+              {
+                validator: (_, value) => {
+                  if (!value || value.trim() === '') {
+                    return Promise.resolve();
+                  }
+                  const trimmed = value.trim();
+                  if (!trimmed.startsWith('0')) {
+                    return Promise.reject(new Error(t('responses.EV008')));
+                  }
+                  if (trimmed.length < 10 || trimmed.length > 11) {
+                    return Promise.reject(new Error(t('responses.EV009')));
+                  }
+                  return Promise.resolve();
+                },
+              },
             ]}
           >
-            <Input placeholder={t('shopBranches.phoneNumberPlaceholder')} />
+            <Input placeholder={t('shopBranches.phoneNumberPlaceholder')} maxLength={11} />
           </Form.Item>
 
           <div className="col-span-2">
             <Form.Item
               name="address"
               label={t('shopBranches.address')}
-              rules={[{ required: true, message: t('shopBranches.addressRequired') }]}
+              rules={[
+                { required: true, whitespace: true, message: t('responses.EV001') },
+                { max: 255, message: t('responses.EV005') },
+                {
+                  pattern: /^[\p{L}0-9\s/.,#-]+$/u,
+                  message: t('responses.EV007'),
+                },
+              ]}
             >
               <Input.TextArea rows={3} placeholder={t('shopBranches.addressPlaceholder')} />
             </Form.Item>
