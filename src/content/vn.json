@@ -162,7 +162,8 @@
     "editSuccess": "Cập nhật chi nhánh thành công.",
     "deleteTitle": "Xác nhận xóa chi nhánh",
     "deleteConfirmDesc": "Hành động này sẽ xóa chi nhánh \"{{name}}\" cùng toàn bộ danh mục và đồ uống trực thuộc chi nhánh này. Bạn có chắc chắn muốn tiếp tục không?",
-    "deleteSuccess": "Xóa chi nhánh thành công."
+    "deleteSuccess": "Xóa chi nhánh thành công.",
+    "deletePendingInvoices": "Không thể xóa chi nhánh còn hóa đơn chưa hoàn tất thanh toán."
   },
   "search": {
     "placeholder": "Tìm kiếm..."
