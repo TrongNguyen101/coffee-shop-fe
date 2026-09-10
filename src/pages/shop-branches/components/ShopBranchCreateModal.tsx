@@ -51,10 +51,7 @@ export function ShopBranchCreateModal({
           let fieldName: keyof ShopBranchCreateValues;
           let localizedError: string;
 
-          if (serverMessage.includes('phone')) {
-            fieldName = 'phoneNumber';
-            localizedError = t('shopBranches.phoneConflict');
-          } else if (serverMessage.includes('address')) {
+          if (serverMessage.includes('address')) {
             fieldName = 'address';
             localizedError = t('shopBranches.addressConflict');
           } else {

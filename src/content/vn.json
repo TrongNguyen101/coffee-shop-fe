@@ -148,7 +148,6 @@
     "phoneRequired": "Vui lòng nhập số điện thoại.",
     "addressRequired": "Vui lòng nhập địa chỉ.",
     "nameConflict": "Tên chi nhánh đã tồn tại.",
-    "phoneConflict": "Số điện thoại đã tồn tại.",
     "addressConflict": "Địa chỉ chi nhánh đã tồn tại.",
     "shopNamePlaceholder": "Nhập tên chi nhánh...",
     "phoneNumberPlaceholder": "Nhập số điện thoại...",
