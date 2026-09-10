@@ -36,14 +36,14 @@ export interface ShopBranchesResponse {
 export interface CreateShopBranchRequest {
   shopName: string;
   address: string;
-  phoneNumber: string | null;
+  phoneNumber: string;
 }
 
 export interface EditShopBranchRequest {
   shopId: string;
   shopName: string;
   address: string;
-  phoneNumber: string | null;
+  phoneNumber: string;
 }
 
 export interface DeleteShopBranchRequest {

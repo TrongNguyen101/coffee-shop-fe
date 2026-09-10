@@ -35,7 +35,7 @@ export function ShopBranchCreateModal({
         ...values,
         shopName: values.shopName?.trim(),
         address: values.address?.trim(),
-        phoneNumber: values.phoneNumber?.trim() ? values.phoneNumber.trim() : null,
+        phoneNumber: values.phoneNumber.trim(),
       };
 
       await onSubmit(payload);
@@ -130,6 +130,7 @@ export function ShopBranchCreateModal({
             label={t('shopBranches.phoneNumber')}
             normalize={(value: string) => (value ? value.replace(/\D/g, '').slice(0, 11) : '')}
             rules={[
+              { required: true, whitespace: true, message: t('responses.EV001') },
               {
                 validator: (_, value) => {
                   if (!value || value.trim() === '') {
