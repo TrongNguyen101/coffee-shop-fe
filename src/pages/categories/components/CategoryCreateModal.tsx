@@ -58,7 +58,7 @@ export function CategoryCreateModal({
 
   const handleSubmit = async (values: CategoryCreateValues) => {
     try {
-      await onSubmit(values);
+      await onSubmit({ ...values, categoryName: values.categoryName.trim() });
       handleClose();
     } catch (error) {
       if (
@@ -97,18 +97,31 @@ export function CategoryCreateModal({
         <Form.Item
           name="categoryName"
           label={t('categories.name')}
-          rules={[{ required: true, message: t('categories.nameRequired') }]}
+          rules={[
+            { required: true, whitespace: true, message: t('categories.nameRequired') },
+            { max: 100, message: t('categories.nameMaxLength') },
+            {
+              pattern: /^[\p{L}\p{N}\s\-']+$/u,
+              message: t('responses.EV007'),
+            },
+          ]}
         >
           <Input onChange={() => form.setFields([{ name: 'categoryName', errors: [] }])} />
         </Form.Item>
 
-        <Form.Item
-          name="shopId"
-          label={t('staffs.shopName')}
-          rules={[{ required: true, message: t('categories.shopRequired') }]}
-        >
-          <Select options={shopOptions} loading={optionsLoading} disabled={isManager} />
-        </Form.Item>
+        {isManager ? (
+          <Form.Item name="shopId" hidden>
+            <Input />
+          </Form.Item>
+        ) : (
+          <Form.Item
+            name="shopId"
+            label={t('staffs.shopName')}
+            rules={[{ required: true, message: t('categories.shopRequired') }]}
+          >
+            <Select options={shopOptions} loading={optionsLoading} />
+          </Form.Item>
+        )}
       </Form>
     </Modal>
   );

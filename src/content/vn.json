@@ -91,13 +91,17 @@
     "title": "Danh Mục",
     "name": "Tên danh mục",
     "searchPlaceholder": "Tìm kiếm danh mục...",
+    "searchMaxLength": "Từ khóa tìm kiếm không được vượt quá 100 ký tự.",
+    "searchInvalid": "Từ khóa tìm kiếm chứa ký tự không hợp lệ.",
     "emptySearch": "Không tìm thấy danh mục nào phù hợp với từ khóa tìm kiếm.",
     "createTitle": "Thêm danh mục",
     "editTitle": "Chỉnh sửa danh mục",
     "createSuccess": "Thêm danh mục thành công.",
     "editSuccess": "Chỉnh sửa danh mục thành công.",
     "deleteSuccess": "Xoá danh mục thành công.",
+    "deleteConfirmDesc": "Xóa danh mục \"{{name}}\" sẽ xóa toàn bộ đồ uống và chi tiết đồ uống (size, giá) thuộc danh mục. Bạn có chắc chắn muốn tiếp tục không?",
     "nameRequired": "Vui lòng nhập tên danh mục.",
+    "nameMaxLength": "Tên danh mục không được vượt quá 100 ký tự.",
     "shopRequired": "Vui lòng chọn chi nhánh.",
     "nameConflict": "Tên danh mục đã tồn tại."
   },
@@ -252,6 +256,9 @@
     "ER500": "Đã xảy ra lỗi máy chủ nội bộ. Vui lòng thử lại sau.",
     "EV001": "Trường này là bắt buộc.",
     "EV002": "Mật khẩu không đúng độ dài yêu cầu.",
-    "EV005": "Số điện thoại không được vượt quá 11 ký tự."
+    "EV005": "Độ dài dữ liệu vượt quá giới hạn cho phép.",
+    "EV007": "Dữ liệu chứa ký tự không hợp lệ.",
+    "EV008": "Số điện thoại không hợp lệ (phải bắt đầu bằng số 0).",
+    "EV009": "Số điện thoại phải có độ dài từ 10 đến 11 chữ số."
   }
 }

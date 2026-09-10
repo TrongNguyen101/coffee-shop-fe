@@ -10,10 +10,16 @@ import type {
   EditCategoryResponse,
   DeleteCategoryRequest,
   DeleteCategoryResponse,
+  ShopNameListResponse,
 } from '../types';
 
 export async function getCategoriesApi(params: CategoryListParams): Promise<CategoryListResponse> {
   const response = await api.post<CategoryListResponse>(ENDPOINT.GET_CATEGORIES, params);
+  return response.data;
+}
+
+export async function getShopNamesApi(): Promise<ShopNameListResponse> {
+  const response = await api.get<ShopNameListResponse>(ENDPOINT.GET_SHOP_NAMES);
   return response.data;
 }
 

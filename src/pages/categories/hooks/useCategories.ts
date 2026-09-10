@@ -1,18 +1,19 @@
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
+import { useAppSelector } from '@/store/hooks';
+import { ROLES } from '@/permission/roles';
 import {
   getCategoriesApi,
+  getShopNamesApi,
   createCategoryApi,
   editCategoryApi,
   deleteCategoryApi,
 } from '../api/categoriesApi';
-import { getShopNamesApi } from '@/pages/staffs/api/staffsApi';
 import { RESPONSE_CODE } from '@/constants/messages';
 import { getResponseMessage } from '@/utils/getResponseMessage';
 import { useToast } from '@/components/toast/useToast';
-import type { CategoryItem, CategoryListParams, PaginationInfo } from '../types';
-import type { ShopNameItem } from '@/pages/staffs/types';
+import type { CategoryItem, CategoryListParams, PaginationInfo, ShopNameItem } from '../types';
 import type { CategoryCreateValues } from '../components/CategoryCreateModal';
 import type { CategoryEditValues } from '../components/CategoryEditModal';
 
@@ -28,6 +29,7 @@ const DEFAULT_PARAMS: CategoryListParams = {
 export function useCategories() {
   const toast = useToast();
   const { t } = useTranslation();
+  const roleName = useAppSelector((state) => state.auth.profile?.roleName);
   const [params, setParams] = useState<CategoryListParams>(DEFAULT_PARAMS);
   const [items, setItems] = useState<CategoryItem[]>([]);
   const [pagination, setPagination] = useState<PaginationInfo | null>(null);
@@ -61,6 +63,8 @@ export function useCategories() {
 
   useEffect(() => {
     async function fetchOptions() {
+      if (roleName !== ROLES.OWNER && roleName !== ROLES.MANAGER) return;
+
       setOptionsLoading(true);
       try {
         const shopNamesRes = await getShopNamesApi();
@@ -70,7 +74,7 @@ export function useCategories() {
       }
     }
     fetchOptions();
-  }, []);
+  }, [roleName]);
 
   const [isSearch, setIsSearch] = useState(false);
 
