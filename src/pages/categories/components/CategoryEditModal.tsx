@@ -12,6 +12,11 @@ export interface CategoryEditValues {
   shopId: string;
 }
 
+interface ErrorDetailItem {
+  errorCode?: string | number;
+  message?: string;
+}
+
 interface CategoryEditModalProps {
   open: boolean;
   onClose: () => void;
@@ -59,17 +64,36 @@ export function CategoryEditModal({
     try {
       await onSubmit({ ...values, categoryName: values.categoryName.trim() });
       handleClose();
-    } catch (error) {
-      if (
-        axios.isAxiosError(error) &&
-        error.response?.data?.code === RESPONSE_CODE.INVALID_REQUEST
-      ) {
-        form.setFields([
-          {
-            name: 'categoryName',
-            errors: [t('categories.nameConflict')],
-          },
-        ]);
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        const resData = error.response?.data;
+        const resCode = resData?.code;
+        const details: ErrorDetailItem[] = Array.isArray(resData?.errorDetails)
+          ? resData.errorDetails
+          : Array.isArray(resData?.data)
+            ? resData.data
+            : [];
+
+        const isConflict =
+          resCode === RESPONSE_CODE.CONFLICT ||
+          resCode === 'ER005' ||
+          resCode === 'ER011' ||
+          details.some(
+            (item) =>
+              item.errorCode === 'ER005' ||
+              item.errorCode === 'ER011' ||
+              item.errorCode === 409 ||
+              item.errorCode === RESPONSE_CODE.CONFLICT,
+          );
+
+        if (isConflict) {
+          form.setFields([
+            {
+              name: 'categoryName',
+              errors: [t('categories.nameConflict')],
+            },
+          ]);
+        }
       }
     }
   };

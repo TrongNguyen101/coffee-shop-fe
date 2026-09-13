@@ -35,21 +35,29 @@ export function CategoryCreateModal({
 }: CategoryCreateModalProps) {
   const { t } = useTranslation();
   const [form] = Form.useForm<CategoryCreateValues>();
+  const profileShopId = useAppSelector(
+    (state) => (state.auth.profile as { shopId?: string } | null)?.shopId,
+  );
   const profileShopName = useAppSelector((state) => state.auth.profile?.shopName);
   const roleName = useAppSelector((state) => state.auth.profile?.roleName);
   const isManager = roleName === ROLES.MANAGER;
 
   useEffect(() => {
-    if (!open || shopOptions.length === 0) return;
-    if (isManager && profileShopName) {
-      const matchedShop = shopOptions.find(
-        (s) => s.label.trim().toLowerCase() === profileShopName.trim().toLowerCase(),
-      );
-      form.setFieldValue('shopId', matchedShop?.value ?? shopOptions[0].value);
-    } else {
+    if (!open) return;
+
+    if (isManager) {
+      if (profileShopId) {
+        form.setFieldValue('shopId', profileShopId);
+      } else if (shopOptions.length > 0 && profileShopName) {
+        const matchedShop = shopOptions.find(
+          (s) => s.label.trim().toLowerCase() === profileShopName.trim().toLowerCase(),
+        );
+        form.setFieldValue('shopId', matchedShop?.value ?? shopOptions[0].value);
+      }
+    } else if (shopOptions.length > 0) {
       form.setFieldValue('shopId', shopOptions[0].value);
     }
-  }, [open, shopOptions, isManager, profileShopName]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [open, shopOptions, isManager, profileShopId, profileShopName, form]);
 
   const handleClose = () => {
     form.resetFields();
@@ -60,17 +68,21 @@ export function CategoryCreateModal({
     try {
       await onSubmit({ ...values, categoryName: values.categoryName.trim() });
       handleClose();
-    } catch (error) {
-      if (
-        axios.isAxiosError(error) &&
-        error.response?.data?.code === RESPONSE_CODE.INVALID_REQUEST
-      ) {
-        form.setFields([
-          {
-            name: 'categoryName',
-            errors: [t('categories.nameConflict')],
-          },
-        ]);
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        const resCode = error.response?.data?.code;
+        if (
+          resCode === RESPONSE_CODE.CONFLICT ||
+          resCode === 'ER005' ||
+          resCode === RESPONSE_CODE.INVALID_REQUEST
+        ) {
+          form.setFields([
+            {
+              name: 'categoryName',
+              errors: [t('categories.nameConflict')],
+            },
+          ]);
+        }
       }
     }
   };

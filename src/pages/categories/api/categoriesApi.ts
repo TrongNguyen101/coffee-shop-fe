@@ -27,14 +27,14 @@ export async function createCategoryApi(
   params: CreateCategoryRequest,
 ): Promise<CreateCategoryResponse> {
   const response = await api.post<CreateCategoryResponse>(ENDPOINT.CREATE_CATEGORY, params, {
-    suppressCodes: [RESPONSE_CODE.NOT_FOUND, RESPONSE_CODE.INVALID_REQUEST],
+    suppressCodes: [RESPONSE_CODE.NOT_FOUND, RESPONSE_CODE.INVALID_REQUEST, RESPONSE_CODE.CONFLICT],
   });
   return response.data;
 }
 
 export async function editCategoryApi(params: EditCategoryRequest): Promise<EditCategoryResponse> {
   const response = await api.put<EditCategoryResponse>(ENDPOINT.EDIT_CATEGORY, params, {
-    suppressCodes: [RESPONSE_CODE.NOT_FOUND, RESPONSE_CODE.INVALID_REQUEST],
+    suppressCodes: [RESPONSE_CODE.NOT_FOUND, RESPONSE_CODE.INVALID_REQUEST, RESPONSE_CODE.CONFLICT],
   });
   return response.data;
 }

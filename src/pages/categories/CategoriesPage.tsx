@@ -78,10 +78,10 @@ export function CategoriesPage() {
       width: 260,
     },
     {
-      key: 'shopId',
-      dataIndex: 'shopId',
-      title: t('staffs.shopName'),
-      render: (_shopId: string, record) => record.shopName,
+      key: 'shopName',
+      dataIndex: 'shopName',
+      title: t('categories.shopName'),
+      //render: (_shopId: string, record) => record.shopName,
     },
   ];
 
@@ -102,7 +102,7 @@ export function CategoriesPage() {
         {isOwner && (
           <Select
             allowClear
-            placeholder={t('staffs.filterShop')}
+            placeholder={t('categories.filterShop')}
             options={shopOptions}
             loading={optionsLoading}
             value={currentBranchShopId || undefined}

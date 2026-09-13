@@ -106,15 +106,27 @@ export function useCategories() {
         toast.success(t('categories.createSuccess'));
         await fetchCategories(params);
       } catch (error) {
-        if (axios.isAxiosError(error) && error.response?.data?.code === RESPONSE_CODE.NOT_FOUND) {
-          toast.error(getResponseMessage(RESPONSE_CODE.NOT_FOUND));
+        if (axios.isAxiosError(error) && error.response?.data) {
+          const resData = error.response.data;
+
+          if (resData.code === RESPONSE_CODE.NOT_FOUND || resData.code === 'ER004') {
+            toast.error(getResponseMessage(RESPONSE_CODE.NOT_FOUND));
+          } else if (
+            resData.code === RESPONSE_CODE.CONFLICT ||
+            resData.code === 'ER005' ||
+            resData.code === 'ER011'
+          ) {
+            toast.error(t('categories.nameConflict'));
+          } else if (resData.code) {
+            toast.error(getResponseMessage(resData.code));
+          }
         }
         throw error;
       } finally {
         setCreateLoading(false);
       }
     },
-    [params, fetchCategories], // eslint-disable-line react-hooks/exhaustive-deps
+    [params, fetchCategories, t, toast],
   );
 
   const editCategory = useCallback(
@@ -125,15 +137,42 @@ export function useCategories() {
         toast.success(t('categories.editSuccess'));
         await fetchCategories(params);
       } catch (error) {
-        if (axios.isAxiosError(error) && error.response?.data?.code === RESPONSE_CODE.NOT_FOUND) {
-          toast.error(getResponseMessage(RESPONSE_CODE.NOT_FOUND));
+        if (axios.isAxiosError(error) && error.response?.data) {
+          const resData = error.response.data;
+
+          if (resData.code === RESPONSE_CODE.NOT_FOUND || resData.code === 'ER004') {
+            toast.error(getResponseMessage(RESPONSE_CODE.NOT_FOUND));
+          } else if (resData.code === RESPONSE_CODE.INVALID_REQUEST || resData.code === 'ER008') {
+            const duplicateError = resData.errorDetails?.find(
+              (err: { errorCode: string }) =>
+                err.errorCode === RESPONSE_CODE.CONFLICT ||
+                err.errorCode === 'ER005' ||
+                err.errorCode === 'ER011',
+            );
+
+            if (duplicateError) {
+              toast.error(t('categories.nameConflict'));
+            } else if (resData.errorDetails?.[0]?.errorCode) {
+              toast.error(getResponseMessage(resData.errorDetails[0].errorCode));
+            } else {
+              toast.error(getResponseMessage(RESPONSE_CODE.INVALID_REQUEST));
+            }
+          } else if (
+            resData.code === RESPONSE_CODE.CONFLICT ||
+            resData.code === 'ER005' ||
+            resData.code === 'ER011'
+          ) {
+            toast.error(t('categories.nameConflict'));
+          } else if (resData.code) {
+            toast.error(getResponseMessage(resData.code));
+          }
         }
         throw error;
       } finally {
         setEditLoading(false);
       }
     },
-    [params, fetchCategories], // eslint-disable-line react-hooks/exhaustive-deps
+    [params, fetchCategories, t, toast],
   );
 
   const deleteCategory = useCallback(
@@ -149,14 +188,20 @@ export function useCategories() {
           await fetchCategories(params);
         }
       } catch (error) {
-        if (axios.isAxiosError(error) && error.response?.data?.code === RESPONSE_CODE.NOT_FOUND) {
+        if (
+          axios.isAxiosError(error) &&
+          (error.response?.data?.code === RESPONSE_CODE.NOT_FOUND ||
+            error.response?.data?.code === 'ER004')
+        ) {
           toast.error(getResponseMessage(RESPONSE_CODE.NOT_FOUND));
+        } else if (axios.isAxiosError(error) && error.response?.data?.code) {
+          toast.error(getResponseMessage(error.response.data.code));
         }
       } finally {
         setDeleteLoading(false);
       }
     },
-    [params, fetchCategories, items.length], // eslint-disable-line react-hooks/exhaustive-deps
+    [params, fetchCategories, items.length, t, toast],
   );
 
   const shopOptions = shopNames.map((s) => ({ value: s.shopId, label: s.shopName }));
