@@ -20,7 +20,7 @@ import type { CategoryEditValues } from '../components/CategoryEditModal';
 const DEFAULT_PARAMS: CategoryListParams = {
   page: 1,
   size: 10,
-  branchShopId: '',
+  shopId: '',
   search: '',
   sortBy: 'categoryId',
   sortDirection: 'ASC',
@@ -88,9 +88,9 @@ export function useCategories() {
     setParams((prev) => ({ ...prev, search, page: 1 }));
   };
 
-  const handleShopFilter = (branchShopId: string) => {
+  const handleShopFilter = (shopId: string) => {
     setIsSearch(false);
-    setParams((prev) => ({ ...prev, branchShopId, page: 1 }));
+    setParams((prev) => ({ ...prev, shopId, page: 1 }));
   };
 
   const handlePageChange = (page: number, size: number) => {
@@ -212,7 +212,7 @@ export function useCategories() {
     currentPage: params.page,
     currentPageSize: params.size,
     searchKeyword: params.search,
-    currentBranchShopId: params.branchShopId,
+    currentShopId: params.shopId,
     loading,
     searchLoading,
     showEmptyModal,

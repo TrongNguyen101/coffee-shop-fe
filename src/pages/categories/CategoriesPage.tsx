@@ -28,7 +28,7 @@ export function CategoriesPage() {
     loading,
     searchLoading,
     searchKeyword,
-    currentBranchShopId,
+    currentShopId,
     showEmptyModal,
     closeEmptyModal,
     handleSearch,
@@ -105,7 +105,7 @@ export function CategoriesPage() {
             placeholder={t('categories.filterShop')}
             options={shopOptions}
             loading={optionsLoading}
-            value={currentBranchShopId || undefined}
+            value={currentShopId || undefined}
             onChange={(val) => handleShopFilter(val ?? '')}
             className="w-52"
           />
