@@ -56,7 +56,7 @@ export function CategoriesPage() {
       showError(t('responses.EV005'), t('common.error'));
       return;
     }
-    if (trimmedValue && !/^[\p{L}\p{N}\s\-']+$/u.test(trimmedValue)) {
+    if (trimmedValue && !/^[\p{L}\p{N}\s\-&/(),.']+$/u.test(trimmedValue)) {
       showError(t('responses.EV007'), t('common.error'));
       return;
     }
