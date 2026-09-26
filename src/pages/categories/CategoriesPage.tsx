@@ -13,6 +13,9 @@ import { CategoryEditModal } from './components/CategoryEditModal';
 import { useCategories } from './hooks/useCategories';
 import type { CategoryItem } from './types';
 
+// Allows: Unicode letters, numbers, spaces, and punctuation: - & / ( ) , . '
+const SEARCH_REGEX = /^[\p{L}\p{N}\s\-&/(),.']*$/u;
+
 export function CategoriesPage() {
   const { t } = useTranslation();
   const { showError } = useNotifyModal();
@@ -56,7 +59,8 @@ export function CategoriesPage() {
       showError(t('responses.EV005'), t('common.error'));
       return;
     }
-    if (trimmedValue && !/^[\p{L}\p{N}\s\-&/(),.']+$/u.test(trimmedValue)) {
+    // Validate search characters
+    if (trimmedValue && !SEARCH_REGEX.test(trimmedValue)) {
       showError(t('responses.EV007'), t('common.error'));
       return;
     }

@@ -27,8 +27,6 @@ interface CategoryEditModalProps {
   loading?: boolean;
 }
 
-const CATEGORY_NAME_REGEX = /^[\p{L}\p{N}\s\-&/(),.']+$/u;
-
 export function CategoryEditModal({
   open,
   onClose,
@@ -148,7 +146,8 @@ export function CategoryEditModal({
               message: t('categories.nameMaxLength'),
             },
             {
-              pattern: CATEGORY_NAME_REGEX,
+              // Allows: Unicode letters, numbers, spaces, and punctuation: - & / ( ) , . '
+              pattern: /^[\p{L}\p{N}\s\-&/(),.']+$/u,
               message: t('responses.EV007'),
             },
           ]}
