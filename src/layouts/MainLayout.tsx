@@ -20,6 +20,7 @@ export function MainLayout() {
   const [collapsed, setCollapsed] = useState(false);
   const { t } = useTranslation();
 
+  // TODO: Temporarily hidden for this release. These routes will be re-enabled in the future.
   const NAV_ITEMS = [
     // { key: '/', label: t('sidebar.drinks'), icon: <CoffeeOutlined /> },
     // { key: '/invoices', label: t('sidebar.invoices'), icon: <FileTextOutlined /> },
