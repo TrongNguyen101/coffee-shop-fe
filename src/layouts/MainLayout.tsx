@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { Layout, Typography } from 'antd';
 import {
-  CoffeeOutlined,
-  FileTextOutlined,
+  // CoffeeOutlined,
+  // FileTextOutlined,
   AppstoreOutlined,
-  LineChartOutlined,
+  // LineChartOutlined,
   TeamOutlined,
   ShopOutlined,
 } from '@ant-design/icons';
@@ -21,10 +21,10 @@ export function MainLayout() {
   const { t } = useTranslation();
 
   const NAV_ITEMS = [
-    { key: '/', label: t('sidebar.drinks'), icon: <CoffeeOutlined /> },
-    { key: '/invoices', label: t('sidebar.invoices'), icon: <FileTextOutlined /> },
+    // { key: '/', label: t('sidebar.drinks'), icon: <CoffeeOutlined /> },
+    // { key: '/invoices', label: t('sidebar.invoices'), icon: <FileTextOutlined /> },
     { key: '/categories', label: t('sidebar.categories'), icon: <AppstoreOutlined /> },
-    { key: '/revenue', label: t('sidebar.revenues'), icon: <LineChartOutlined /> },
+    // { key: '/revenue', label: t('sidebar.revenues'), icon: <LineChartOutlined /> },
     { key: '/staff', label: t('sidebar.staffs'), icon: <TeamOutlined /> },
     { key: '/shop', label: t('sidebar.shops'), icon: <ShopOutlined /> },
   ];
