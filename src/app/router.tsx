@@ -8,7 +8,7 @@ import { StaffsPage } from '@/pages/staffs/StaffsPage';
 import { CategoriesPage } from '@/pages/categories/CategoriesPage';
 import { RevenuesPage } from '@/pages/revenue/RevenuesPage';
 import { InvoicesPage } from '@/pages/invoices/InvoicesPage';
-import { ShopBranchPage } from '@/pages/shop-branches/ShopBranchPage';
+import { ShopPage } from '@/pages/shop/ShopPage';
 
 export const router = createHashRouter([
   // Public routes — login wrapped in AuthLayout
@@ -31,6 +31,10 @@ export const router = createHashRouter([
         children: [
           {
             path: '/',
+            element: <Navigate to="/shop" replace />,
+          },
+          {
+            path: '/drinks',
             element: <DrinksPage />,
           },
           {
@@ -50,8 +54,8 @@ export const router = createHashRouter([
             element: <InvoicesPage />,
           },
           {
-            path: '/shop-branches',
-            element: <ShopBranchPage />,
+            path: '/shop',
+            element: <ShopPage />,
           },
         ],
       },
