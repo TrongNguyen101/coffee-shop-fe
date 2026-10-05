@@ -1,86 +1,107 @@
-import { useRef, useState } from 'react';
+import { useRef, type KeyboardEvent, type ClipboardEvent, type ChangeEvent } from 'react';
 import { Input, type InputProps, type InputRef } from 'antd';
-import type { ClipboardEvent, CompositionEvent } from 'react';
 
 interface DrinkPriceInputProps extends Omit<InputProps, 'onChange' | 'value'> {
-  value?: string;
+  value?: string | number;
   onChange?: (value: string) => void;
 }
 
-// VND has no decimal part; Vietnamese format groups thousands with a dot (35.000).
 const THOUSANDS_SEPARATOR = '.';
-const PASTED_PRICE_PATTERN = /^(?:\d+|\d{1,3}(?:[.,]\d{3})+)$/;
 
-function normalizePrice(value: string): string {
-  return value.replace(/\D/g, '').replace(/^0+(?=\d)/, '');
+function cleanDigits(val: string): string {
+  return val.replace(/\D/g, '').replace(/^0+(?=\d)/, '');
 }
 
-function formatInputPrice(value: string): string {
-  return value.replace(/\B(?=(\d{3})+(?!\d))/g, THOUSANDS_SEPARATOR);
-}
-
-function getCaretPosition(formattedValue: string, semanticLength: number): number {
-  if (semanticLength === 0) return 0;
-
-  let semanticIndex = 0;
-  for (let index = 0; index < formattedValue.length; index += 1) {
-    if (formattedValue[index] !== THOUSANDS_SEPARATOR) semanticIndex += 1;
-    if (semanticIndex === semanticLength) return index + 1;
-  }
-
-  return formattedValue.length;
+function formatNumberWithDots(val: string): string {
+  if (!val) return '';
+  return val.replace(/\B(?=(\d{3})+(?!\d))/g, THOUSANDS_SEPARATOR);
 }
 
 export function DrinkPriceInput({ value = '', onChange, ...props }: DrinkPriceInputProps) {
   const inputRef = useRef<InputRef>(null);
-  // Vietnamese IMEs (Telex/VNI) compose text; rewriting the value mid-composition breaks them.
-  const isComposingRef = useRef(false);
-  const [composingText, setComposingText] = useState<string | null>(null);
 
-  const updatePrice = (input: HTMLInputElement) => {
-    const inputValue = input.value;
-    const caret = input.selectionStart ?? inputValue.length;
-    const normalizedValue = normalizePrice(inputValue);
-    const normalizedPrefix = normalizePrice(inputValue.slice(0, caret));
-    const formattedValue = formatInputPrice(normalizedValue);
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    props.onKeyDown?.(e);
+    if (e.defaultPrevented) return;
 
-    input.value = formattedValue;
-    onChange?.(normalizedValue);
-    requestAnimationFrame(() => {
-      inputRef.current?.input?.setSelectionRange(
-        getCaretPosition(formattedValue, normalizedPrefix.length),
-        getCaretPosition(formattedValue, normalizedPrefix.length),
-      );
-    });
-  };
+    const allowedKeys = [
+      'Backspace',
+      'Delete',
+      'Tab',
+      'Escape',
+      'Enter',
+      'ArrowLeft',
+      'ArrowRight',
+      'ArrowUp',
+      'ArrowDown',
+      'Home',
+      'End',
+    ];
 
-  const handleChange: NonNullable<InputProps['onChange']> = (event) => {
-    if (isComposingRef.current) {
-      setComposingText(event.target.value);
+    if (
+      allowedKeys.includes(e.key) ||
+      (e.ctrlKey === true && ['a', 'c', 'v', 'x', 'z'].includes(e.key.toLowerCase())) ||
+      (e.metaKey === true && ['a', 'c', 'v', 'x', 'z'].includes(e.key.toLowerCase()))
+    ) {
       return;
     }
 
-    updatePrice(event.target);
+    if (!/^[0-9]$/.test(e.key)) {
+      e.preventDefault();
+    }
   };
 
-  const handleCompositionStart = (event: CompositionEvent<HTMLInputElement>) => {
-    isComposingRef.current = true;
-    setComposingText(event.currentTarget.value);
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const rawVal = e.target.value;
+    const inputElement = e.target;
+    const oldCaret = inputElement.selectionStart ?? rawVal.length;
+
+    const digitsBeforeCaret = rawVal.slice(0, oldCaret).replace(/\D/g, '').length;
+
+    const rawDigits = cleanDigits(rawVal);
+    const formatted = formatNumberWithDots(rawDigits);
+
+    onChange?.(rawDigits);
+
+    requestAnimationFrame(() => {
+      if (!inputRef.current?.input) return;
+
+      let newCaret = 0;
+      let countedDigits = 0;
+
+      for (let i = 0; i < formatted.length; i++) {
+        if (formatted[i] !== THOUSANDS_SEPARATOR) {
+          countedDigits++;
+        }
+        if (countedDigits === digitsBeforeCaret) {
+          newCaret = i + 1;
+          break;
+        }
+      }
+
+      if (countedDigits < digitsBeforeCaret || newCaret === 0) {
+        newCaret = formatted.length;
+      }
+
+      inputRef.current.input.setSelectionRange(newCaret, newCaret);
+    });
   };
 
-  const handleCompositionEnd = (event: CompositionEvent<HTMLInputElement>) => {
-    isComposingRef.current = false;
-    setComposingText(null);
-    updatePrice(event.currentTarget);
+  const handlePaste = (e: ClipboardEvent<HTMLInputElement>) => {
+    props.onPaste?.(e);
+    if (e.defaultPrevented) return;
+
+    const pastedData = e.clipboardData.getData('text');
+    if (/[^\d.,]/.test(pastedData)) {
+      e.preventDefault();
+      const cleanPasted = cleanDigits(pastedData);
+      if (cleanPasted) {
+        onChange?.(cleanPasted);
+      }
+    }
   };
 
-  const handlePaste = (event: ClipboardEvent<HTMLInputElement>) => {
-    props.onPaste?.(event);
-    if (event.defaultPrevented) return;
-
-    const pastedValue = event.clipboardData.getData('text').trim();
-    if (!PASTED_PRICE_PATTERN.test(pastedValue)) event.preventDefault();
-  };
+  const displayValue = formatNumberWithDots(cleanDigits(String(value ?? '')));
 
   return (
     <Input
@@ -88,11 +109,10 @@ export function DrinkPriceInput({ value = '', onChange, ...props }: DrinkPriceIn
       ref={inputRef}
       type="text"
       inputMode="numeric"
-      value={composingText ?? formatInputPrice(value)}
+      value={displayValue}
+      onKeyDown={handleKeyDown}
       onChange={handleChange}
       onPaste={handlePaste}
-      onCompositionStart={handleCompositionStart}
-      onCompositionEnd={handleCompositionEnd}
       suffix="đ"
       placeholder="35.000"
     />
