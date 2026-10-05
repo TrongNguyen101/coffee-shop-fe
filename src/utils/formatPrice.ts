@@ -1,4 +1,4 @@
-export function formatDrinkPrice(value: number | string | null | undefined): string {
+export function formatPrice(value: number | string | null | undefined): string {
   if (value == null || String(value).trim() === '') return '—';
 
   const amount = Number(String(value).replaceAll(',', ''));

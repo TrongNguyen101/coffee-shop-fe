@@ -7,7 +7,7 @@ import type { UploadChangeParam, UploadFile } from 'antd/es/upload';
 import { RESPONSE_CODE } from '@/constants/messages';
 import type { DrinkItem, EditDrinkRequest, CategorySelectOption } from '../types';
 import { resolveImageUrl } from '@/utils/image';
-import { formatDrinkPrice } from '../utils/drinkPrice';
+import { formatPrice } from '@/utils/formatPrice';
 
 const DRINK_NAME_PATTERN = /^[\p{L}\p{N}\s&/(),.'-]+$/u;
 
@@ -207,7 +207,7 @@ export function DrinkEditModal({
         {/* Variant editing is not supported by the backend yet. */}
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <Form.Item label={t('drinks.price')}>
-            <Input value={formatDrinkPrice(record?.variants?.[0]?.price)} readOnly />
+            <Input value={formatPrice(record?.variants?.[0]?.price)} readOnly />
           </Form.Item>
 
           <Form.Item label={t('drinks.size')}>

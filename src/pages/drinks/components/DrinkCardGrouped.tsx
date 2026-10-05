@@ -3,7 +3,7 @@ import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { resolveImageUrl } from '@/utils/image';
 import type { DrinkItem } from '../types';
-import { formatDrinkPrice } from '../utils/drinkPrice';
+import { formatPrice } from '@/utils/formatPrice';
 
 interface Props {
   record: DrinkItem;
@@ -82,7 +82,7 @@ export function DrinkCardGrouped({ record, onClick, onDelete, onEdit, isStaff = 
           <Typography.Text strong className="text-sm text-green-700">
             {startingPrice === undefined
               ? '—'
-              : `${t('drinks.startingPrice')} ${formatDrinkPrice(startingPrice)}`}
+              : `${t('drinks.startingPrice')} ${formatPrice(startingPrice)}`}
           </Typography.Text>
           <Tag color={isActive ? 'green' : 'default'} className="m-0!">
             {record.status || '—'}

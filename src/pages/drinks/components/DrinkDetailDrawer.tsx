@@ -2,7 +2,7 @@ import { Button, Drawer, Radio, Spin, Tag, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { resolveImageUrl } from '@/utils/image';
 import type { DrinkItem } from '../types';
-import { formatDrinkPrice } from '../utils/drinkPrice';
+import { formatPrice } from '@/utils/formatPrice';
 
 interface DrinkDetailDrawerProps {
   open: boolean;
@@ -89,7 +89,7 @@ export function DrinkDetailDrawer({
                   >
                     {selected.variants.map((v, idx) => (
                       <Radio.Button key={v.drinkDetailId || idx} value={idx}>
-                        {v.size.trim()} - {formatDrinkPrice(v.price)}
+                        {v.size.trim()} - {formatPrice(v.price)}
                       </Radio.Button>
                     ))}
                   </Radio.Group>
@@ -101,7 +101,7 @@ export function DrinkDetailDrawer({
               <div>
                 <div className="text-sm text-gray-500">{t('drinks.price')}</div>
                 <div className="text-xl font-bold text-green-600">
-                  {formatDrinkPrice(priceForSelected())}
+                  {formatPrice(priceForSelected())}
                 </div>
               </div>
 
