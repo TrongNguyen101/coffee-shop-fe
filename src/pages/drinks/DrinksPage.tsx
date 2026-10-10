@@ -192,19 +192,20 @@ export function DrinksPage() {
       </div>
 
       {/* Pagination Controls */}
-      <div className="mt-1 flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="min-w-0 max-w-full overflow-x-auto sm:flex-1">
+      <div className="mt-2 flex w-full flex-col items-center gap-3 sm:flex-row sm:justify-between">
+        <div className="hidden sm:block sm:w-[120px]" />
+
+        <div className="flex justify-center">
           <Pagination
             current={currentPage}
             pageSize={currentPageSize}
             total={totalElements}
             onChange={(p, ps) => handlePageChange(p, ps)}
             showSizeChanger={false}
-            className="flex justify-center"
           />
         </div>
 
-        <div className="flex justify-end sm:flex-1">
+        <div className="flex justify-end w-full sm:w-[120px]">
           <Select
             value={currentPageSize}
             onChange={(val) => handlePageChange(1, Number(val))}
