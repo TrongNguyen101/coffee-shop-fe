@@ -1,6 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
+import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/components/toast/useToast';
+import { RESPONSE_CODE } from '@/constants/messages';
+import { getResponseMessage } from '@/utils/getResponseMessage';
 import {
   getDrinksApi,
   createDrinkApi,
@@ -18,11 +21,51 @@ import type {
 } from '../types';
 import type { ShopNameItem } from '@/pages/staffs/types';
 
+function showDrinkApiError(
+  error: unknown,
+  showError: (message: string) => void,
+  t: (key: string) => string,
+) {
+  if (!axios.isAxiosError(error) || !error.response?.data) return;
+
+  const response = error.response.data;
+  const errorCode = response.code as string | undefined;
+
+  const errorDetails: { errorCode?: string }[] = Array.isArray(response?.errorDetails)
+    ? response.errorDetails
+    : [];
+
+  const isNameConflict =
+    [RESPONSE_CODE.CONFLICT, 'ER011'].includes(errorCode ?? '') ||
+    errorDetails.some(
+      ({ errorCode: detailCode }) =>
+        detailCode === RESPONSE_CODE.CONFLICT || detailCode === 'ER011',
+    );
+
+  if (isNameConflict) {
+    showError(t('drinks.nameConflict'));
+    return;
+  }
+
+  if (errorCode === RESPONSE_CODE.NOT_FOUND || errorCode === 'ER004') {
+    showError(getResponseMessage(RESPONSE_CODE.NOT_FOUND));
+  } else if (errorCode === RESPONSE_CODE.INVALID_REQUEST || errorCode === 'ER008') {
+    const firstDetailCode = errorDetails[0]?.errorCode;
+    if (firstDetailCode === RESPONSE_CODE.PRICE_MIN) {
+      showError(getResponseMessage(RESPONSE_CODE.PRICE_MIN));
+    } else {
+      showError(getResponseMessage(firstDetailCode || RESPONSE_CODE.INVALID_REQUEST));
+    }
+  } else if (errorCode) {
+    showError(getResponseMessage(errorCode));
+  }
+}
+
 // Default pagination, search, and shop filter parameters
 const DEFAULT_PARAMS: GetDrinksRequest = {
   page: 1,
   size: 10,
-  branchShopId: '',
+  shopId: '',
   search: '',
   sortBy: 'drinkName',
   sortDirection: 'ASC',
@@ -66,7 +109,7 @@ export function useDrinks(initialPage = 1, initialSize = 10) {
         const payload: GetDrinksRequest = {
           page: currentParams.page,
           size: currentParams.size,
-          branchShopId: currentParams.branchShopId || '',
+          shopId: currentParams.shopId || '',
           search: currentParams.search?.trim() || '',
           sortBy: currentParams.sortBy || 'drinkName',
           sortDirection: currentParams.sortDirection || 'ASC',
@@ -150,7 +193,7 @@ export function useDrinks(initialPage = 1, initialSize = 10) {
         toast.success(t('drinks.createSuccess'));
         await fetchDrinks(params);
       } catch (error) {
-        console.error('Failed to create drink:', error);
+        showDrinkApiError(error, toast.error, t);
         throw error;
       } finally {
         setCreateLoading(false);
@@ -168,7 +211,7 @@ export function useDrinks(initialPage = 1, initialSize = 10) {
         toast.success(t('drinks.editSuccess'));
         await fetchDrinks(params);
       } catch (error) {
-        console.error('Failed to edit drink:', error);
+        showDrinkApiError(error, toast.error, t);
         throw error;
       } finally {
         setEditLoading(false);
@@ -186,8 +229,7 @@ export function useDrinks(initialPage = 1, initialSize = 10) {
         toast.success(t('drinks.deleteSuccess'));
         await fetchDrinks(params);
       } catch (error) {
-        console.error('Failed to delete drink:', error);
-        toast.error(t('drinks.deleteError'));
+        showDrinkApiError(error, toast.error, t);
       } finally {
         setDeleteLoading(false);
       }
@@ -206,11 +248,11 @@ export function useDrinks(initialPage = 1, initialSize = 10) {
   };
 
   // Handler for shop filter changes
-  const handleShopFilter = (branchShopId: string) => {
+  const handleShopFilter = (shopId: string) => {
     setIsSearch(false);
     setParams((prev) => ({
       ...prev,
-      branchShopId,
+      shopId,
       page: 1,
     }));
   };
@@ -237,7 +279,7 @@ export function useDrinks(initialPage = 1, initialSize = 10) {
     currentPage: params.page,
     currentPageSize: params.size,
     searchKeyword: params.search ?? '',
-    currentBranchShopId: params.branchShopId,
+    currentShopId: params.shopId,
     loading,
     searchLoading,
     createLoading,
