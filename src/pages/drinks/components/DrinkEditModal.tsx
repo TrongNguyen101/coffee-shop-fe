@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { Modal, Form, Input, Select, Upload, Button, Divider } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
@@ -63,6 +63,12 @@ export function DrinkEditModal({
   const [form] = Form.useForm<DrinkEditFormValues>();
   const isOpenedRef = useRef(false);
 
+  // Filter category options so they only belong to the target drink's shop
+  const filteredCategoryOptions = useMemo(() => {
+    if (!record?.shopId) return categoryOptions;
+    return categoryOptions.filter((cat) => cat.shopId === record.shopId);
+  }, [categoryOptions, record]);
+
   // Synchronize form fields only once when transitioning from closed -> open
   useEffect(() => {
     if (!open) {
@@ -125,6 +131,7 @@ export function DrinkEditModal({
       const errorDetails: { errorCode?: string }[] = Array.isArray(response?.errorDetails)
         ? response.errorDetails
         : [];
+
       const isNameConflict =
         response?.code === RESPONSE_CODE.CONFLICT ||
         response?.code === 'ER011' ||
@@ -199,8 +206,10 @@ export function DrinkEditModal({
         >
           <Select
             placeholder={t('form.selectCategoryPlaceholder')}
-            options={categoryOptions}
-            notFoundContent={categoryOptions.length === 0 ? t('drinks.noCategory') : undefined}
+            options={filteredCategoryOptions}
+            notFoundContent={
+              filteredCategoryOptions.length === 0 ? t('drinks.noCategory') : undefined
+            }
           />
         </Form.Item>
 
