@@ -10,6 +10,18 @@ export interface TableItem {
   updatedAt?: string | null;
 }
 
+export interface TableFormValues {
+  tableNumber: number;
+  description?: string;
+  status: number;
+  shopId: string;
+}
+
+export interface TableShopOption {
+  value: string;
+  label: string;
+}
+
 export interface TablePagination {
   page: number;
   size: number;

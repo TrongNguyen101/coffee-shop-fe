@@ -1,23 +1,19 @@
 import { useEffect, useRef } from 'react';
-import { Modal, Form, Input, InputNumber, Select, Button, Divider } from 'antd';
+import { Form } from 'antd';
 import { useTranslation } from 'react-i18next';
-import axios from 'axios';
 import { useAppSelector } from '@/store/hooks';
 import { ROLES } from '@/permission/roles';
-import { RESPONSE_CODE } from '@/constants/messages';
-import type { TableItem } from '../types';
+import type { TableFormValues, TableItem, TableShopOption } from '../types';
+import { TableFormModal } from './TableFormModal';
+import {
+  TableDescriptionField,
+  TableNumberField,
+  TableShopField,
+  TableStatusField,
+} from './TableFormFields';
+import { useTableFormError } from '../hooks/useTableFormError';
 
-export interface TableEditValues {
-  tableNumber: number;
-  description?: string;
-  status: number;
-  shopId: string;
-}
-
-interface SelectOption {
-  value: string;
-  label: string;
-}
+export type TableEditValues = TableFormValues;
 
 interface TableEditModalProps {
   open: boolean;
@@ -25,7 +21,7 @@ interface TableEditModalProps {
   record: TableItem | null;
   onSubmit: (values: TableEditValues) => Promise<void> | void;
   loading?: boolean;
-  shopOptions?: SelectOption[];
+  shopOptions?: TableShopOption[];
   optionsLoading?: boolean;
 }
 
@@ -40,6 +36,7 @@ export function TableEditModal({
 }: TableEditModalProps) {
   const { t } = useTranslation();
   const [form] = Form.useForm<TableEditValues>();
+  const handleApiError = useTableFormError(form);
   const roleName = useAppSelector((state) => state.auth.profile?.roleName);
   const isOwner = roleName === ROLES.OWNER;
   const isOpenedRef = useRef(false);
@@ -49,16 +46,16 @@ export function TableEditModal({
       isOpenedRef.current = false;
       return;
     }
-    if (!isOpenedRef.current && record) {
-      isOpenedRef.current = true;
-      form.resetFields();
-      form.setFieldsValue({
-        tableNumber: record.tableNumber,
-        description: record.description ?? '',
-        status: record.status ?? 1,
-        shopId: record.shopId,
-      });
-    }
+    if (isOpenedRef.current || !record) return;
+
+    isOpenedRef.current = true;
+    form.resetFields();
+    form.setFieldsValue({
+      tableNumber: record.tableNumber,
+      description: record.description ?? '',
+      status: record.status ?? 1,
+      shopId: record.shopId,
+    });
   }, [open, record, form]);
 
   const handleClose = () => {
@@ -77,135 +74,29 @@ export function TableEditModal({
       });
       handleClose();
     } catch (error: unknown) {
-      if (axios.isAxiosError(error)) {
-        const resData = error.response?.data;
-        const resCode = resData?.code;
-        const serverMessage = (
-          typeof resData?.message === 'string' ? resData.message : ''
-        ).toLowerCase();
-
-        if (
-          resCode === RESPONSE_CODE.CONFLICT ||
-          resCode === 'ER005' ||
-          serverMessage.includes('already exists')
-        ) {
-          form.setFields([
-            {
-              name: 'tableNumber',
-              errors: [t('tables.numberConflict')],
-            },
-          ]);
-        }
-      }
+      handleApiError(error);
     }
   };
 
   return (
-    <Modal
+    <TableFormModal<TableEditValues>
       open={open}
-      onCancel={handleClose}
-      centered
+      onClose={handleClose}
+      form={form}
+      onFinish={handleSubmit}
+      loading={loading}
       title={t('tables.editTitle')}
-      width={480}
-      footer={
-        <div className="flex justify-end gap-2">
-          <Button onClick={handleClose}>{t('form.cancel')}</Button>
-          <Button type="primary" loading={loading} onClick={() => form.submit()}>
-            {t('form.save')}
-          </Button>
-        </div>
-      }
+      submitLabel={t('form.save')}
     >
-      <Divider className="my-3!" />
-
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={handleSubmit}
-        onValuesChange={(changedValues) => {
-          if ('tableNumber' in changedValues) {
-            form.setFields([{ name: 'tableNumber', errors: [] }]);
-          }
-        }}
-      >
-        <Form.Item
-          name="tableNumber"
-          label={t('tables.tableNumber')}
-          rules={[
-            {
-              validator: (_, value) => {
-                if (value === undefined || value === null || value === '') {
-                  return Promise.reject(new Error(t('tables.tableNumberRequired')));
-                }
-                const num = Number(value);
-                if (isNaN(num) || !Number.isInteger(num) || num < 1) {
-                  return Promise.reject(new Error(t('tables.tableNumberInvalid')));
-                }
-                if (num > 9999) {
-                  return Promise.reject(new Error(t('responses.EV005')));
-                }
-                return Promise.resolve();
-              },
-            },
-          ]}
-        >
-          <InputNumber
-            className="w-full!"
-            precision={0}
-            placeholder={t('tables.tableNumberPlaceholder')}
-          />
-        </Form.Item>
-
-        <Form.Item
-          name="description"
-          label={t('tables.description')}
-          rules={[
-            { max: 255, message: t('responses.EV005') },
-            {
-              // Allows: Unicode letters, numbers, spaces, and punctuation: - & / ( ) , . '
-              pattern: /^[\p{L}\p{N}\s\-&/(),.']*$/u,
-              message: t('responses.EV007'),
-            },
-          ]}
-        >
-          <Input.TextArea
-            rows={2}
-            maxLength={255}
-            showCount
-            placeholder={t('tables.descriptionPlaceholder')}
-          />
-        </Form.Item>
-
-        <Form.Item name="status" label={t('tables.status')} rules={[{ required: true }]}>
-          <Select
-            options={[
-              { value: 1, label: t('tables.statusOptions.available') },
-              { value: 2, label: t('tables.statusOptions.occupied') },
-              { value: 3, label: t('tables.statusOptions.reserved') },
-            ]}
-          />
-        </Form.Item>
-
-        {isOwner ? (
-          <Form.Item
-            name="shopId"
-            label={t('tables.shopName')}
-            rules={[{ required: true, message: t('tables.shopRequired') }]}
-          >
-            <Select
-              disabled
-              options={shopOptions}
-              loading={optionsLoading}
-              showSearch
-              optionFilterProp="label"
-            />
-          </Form.Item>
-        ) : (
-          <Form.Item name="shopId" hidden>
-            <Input />
-          </Form.Item>
-        )}
-      </Form>
-    </Modal>
+      <TableNumberField />
+      <TableDescriptionField />
+      <TableStatusField />
+      <TableShopField
+        isOwner={isOwner}
+        options={shopOptions}
+        optionsLoading={optionsLoading}
+        disabled
+      />
+    </TableFormModal>
   );
 }

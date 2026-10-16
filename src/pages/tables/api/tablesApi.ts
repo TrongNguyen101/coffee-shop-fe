@@ -18,7 +18,7 @@ export async function getTablesApi(payload: SearchTablesRequest): Promise<Tables
 export async function createTableApi(payload: CreateTableRequest): Promise<void> {
   await api.post(ENDPOINT.CREATE_TABLE, payload, {
     // Field-level errors are surfaced inside the create modal
-    suppressCodes: [RESPONSE_CODE.INVALID_REQUEST],
+    suppressCodes: [RESPONSE_CODE.INVALID_REQUEST, RESPONSE_CODE.CONFLICT],
   });
 }
 

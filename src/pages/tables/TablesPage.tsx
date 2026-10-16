@@ -10,7 +10,7 @@ import { useNotifyModal } from '@/components/modal/NotifyModal';
 import { useConfirmModal } from '@/components/modal/ConfirmModal';
 import { useTables } from './hooks/useTables';
 import { TableCard } from './components/TableCard';
-import { getTableCardStyle, tableStatusKey } from './utils/tableStatus';
+import { tableStatusKey } from './utils/utils';
 import { TableCreateModal } from './components/TableCreateModal';
 import { TableEditModal } from './components/TableEditModal';
 import type { TableItem } from './types';
@@ -178,7 +178,7 @@ export function TablesPage() {
   };
 
   return (
-    <div className="flex flex-col gap-3 rounded-xl p-4 bg-white shadow-sm">
+    <div className="flex h-full min-h-0 flex-col gap-3 overflow-hidden rounded-xl bg-white p-4 shadow-sm">
       <Typography.Title level={4} className="mb-0!">
         {t('tables.title')}
       </Typography.Title>
@@ -227,21 +227,11 @@ export function TablesPage() {
         )}
       </div>
 
-      {/* Status legend */}
-      <div className="flex items-center gap-4 flex-wrap text-xs text-gray-600">
-        {[1, 2, 3].map((status) => (
-          <span key={status} className="inline-flex items-center gap-1.5">
-            <span className={`h-2.5 w-2.5 rounded-full ${getTableCardStyle(status).dot}`} />
-            {t(tableStatusKey(status))}
-          </span>
-        ))}
-      </div>
-
       {/* Table cards square grid */}
-      <div className="w-full border border-gray-200 rounded-lg p-3 h-[calc(100vh-330px)] min-h-[420px] overflow-y-auto bg-gray-50/30 relative">
+      <div className="relative min-h-0 w-full flex-1 overflow-y-auto rounded-lg border border-gray-200 bg-gray-50/30 p-3">
         {loading || deleteLoading ? (
           <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/50 backdrop-blur-[1px]">
-            <Spin tip={t('common.loading')} />
+            <Spin description={t('common.loading')} />
           </div>
         ) : null}
 

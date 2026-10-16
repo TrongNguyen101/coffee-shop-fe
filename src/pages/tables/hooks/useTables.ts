@@ -243,7 +243,7 @@ export function useTables(initialPage = 1, initialSize = 10) {
           if (resData.code === RESPONSE_CODE.NOT_FOUND || resData.code === 'ER004') {
             toast.error(getResponseMessage(RESPONSE_CODE.NOT_FOUND));
           } else if (message.includes('pending invoices')) {
-            toast.error(t('categories.deletePendingInvoices'));
+            toast.error(t('tables.deletePendingInvoices'));
           } else if (resData.code) {
             toast.error(getResponseMessage(resData.code));
           }
