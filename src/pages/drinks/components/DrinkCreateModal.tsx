@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react';
 import { Form, Input, Upload, type UploadFile, type UploadProps } from 'antd';
 import { useTranslation } from 'react-i18next';
 import type { CreateDrinkRequest, CategorySelectOption } from '../types';
-import { DrinkPriceInput } from './DrinkPriceInput';
 import { DrinkFormModal } from './DrinkFormModal';
 import {
   DrinkCategoryField,
   DrinkNameField,
+  DrinkPriceField,
   DrinkStatusField,
   DrinkUploadAction,
 } from './DrinkFormFields';
@@ -105,22 +105,7 @@ export function DrinkCreateModal({
       <DrinkCategoryField options={categoryOptions} onChange={handleCategoryChange} />
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <Form.Item
-          name="price"
-          label={t('drinks.price')}
-          rules={[
-            { required: true, message: t('drinks.validation.priceRequired') },
-            {
-              validator: (_, value: string | null) => {
-                if (value == null || value.trim() === '') return Promise.resolve();
-                if (Number.isFinite(Number(value)) && Number(value) > 1) return Promise.resolve();
-                return Promise.reject(new Error(t('drinks.validation.priceInvalid')));
-              },
-            },
-          ]}
-        >
-          <DrinkPriceInput />
-        </Form.Item>
+        <DrinkPriceField />
 
         <Form.Item label={t('drinks.size')}>
           <Input value={t('drinks.sizeOptions.M')} disabled />
