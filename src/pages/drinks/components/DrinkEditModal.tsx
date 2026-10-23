@@ -31,12 +31,12 @@ interface Props {
   categoryOptions?: CategorySelectOption[];
 }
 
-const ACTIVE_STATUSES: unknown[] = [1, '1', 'ACTIVE', 'Active', 'Đang bán'];
-const INACTIVE_STATUSES: unknown[] = [0, '0', 'INACTIVE', 'Inactive', 'Ngừng bán'];
+const ACTIVE_STATUSES = new Set<unknown>([1, '1', 'ACTIVE', 'Active', 'Đang bán']);
+const INACTIVE_STATUSES = new Set<unknown>([0, '0', 'INACTIVE', 'Inactive', 'Ngừng bán']);
 
 const parseStatus = (status: unknown): number => {
-  if (ACTIVE_STATUSES.includes(status)) return 1;
-  if (INACTIVE_STATUSES.includes(status)) return 0;
+  if (ACTIVE_STATUSES.has(status)) return 1;
+  if (INACTIVE_STATUSES.has(status)) return 0;
   return 1;
 };
 
