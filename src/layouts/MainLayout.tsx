@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Layout, Typography } from 'antd';
 import {
-  // CoffeeOutlined,
+  CoffeeOutlined,
   // FileTextOutlined,
   AppstoreOutlined,
   // LineChartOutlined,
@@ -23,7 +23,7 @@ export function MainLayout() {
 
   // TODO: Temporarily hidden for this release. These routes will be re-enabled in the future.
   const NAV_ITEMS = [
-    // { key: '/', label: t('sidebar.drinks'), icon: <CoffeeOutlined /> },
+    { key: '/drinks', label: t('sidebar.drinks'), icon: <CoffeeOutlined /> },
     // { key: '/invoices', label: t('sidebar.invoices'), icon: <FileTextOutlined /> },
     { key: '/categories', label: t('sidebar.categories'), icon: <AppstoreOutlined /> },
     { key: '/tables', label: t('sidebar.tables'), icon: <TableOutlined /> },
@@ -35,7 +35,7 @@ export function MainLayout() {
   const navItems = useNavItems(NAV_ITEMS);
 
   return (
-    <Layout className="min-h-screen">
+    <Layout className="h-dvh overflow-hidden">
       <Header
         className="flex items-center justify-between px-4 md:px-8 sticky! top-0 z-10"
         style={{
@@ -64,7 +64,7 @@ export function MainLayout() {
         <Layout>
           <Content
             className="p-4 overflow-hidden"
-            style={{ height: 'calc(100vh - 64px)', overflowY: 'auto' }}
+            style={{ height: 'calc(100dvh - 64px)', overflowY: 'hidden' }}
           >
             <Outlet />
           </Content>
