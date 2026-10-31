@@ -10,7 +10,10 @@ const isAllowedDrinkNameCharacter = (character: string) =>
 
 interface DrinkCategoryFieldProps {
   readonly options: CategorySelectOption[];
-  readonly onChange?: (value: string, option?: CategorySelectOption | CategorySelectOption[]) => void;
+  readonly onChange?: (
+    value: string,
+    option?: CategorySelectOption | CategorySelectOption[],
+  ) => void;
 }
 
 export function DrinkNameField() {
