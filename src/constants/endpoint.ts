@@ -26,6 +26,11 @@ export const ENDPOINT = {
   DELETE_DRINK: '/drink/delete',
   UPDATE_DRINK: '/drink/edit',
 
+  // Drink Details
+  CREATE_DRINK_DETAIL: '/drink-detail/create',
+  EDIT_DRINK_DETAIL: '/drink-detail/edit',
+  DELETE_DRINK_DETAIL: '/drink-detail/delete',
+
   // Revenue
   GET_REVENUES: '/revenues',
 
@@ -34,6 +39,12 @@ export const ENDPOINT = {
   CREATE_INVOICE: '/invoice/create',
   EDIT_INVOICE: '/invoice/edit',
   UPDATE_INVOICE_STATUS: '/invoice/status',
+
+  // Tables
+  GET_TABLES: '/tables',
+  CREATE_TABLE: '/tables/create',
+  EDIT_TABLE: 'table/edit',
+  DELETE_TABLE: '/table/delete',
 
   // Shop
   GET_SHOPES: '/shops',
