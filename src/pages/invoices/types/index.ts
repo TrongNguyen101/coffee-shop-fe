@@ -1,19 +1,22 @@
 export interface InvoiceItemResult {
   invoiceDetailId: string;
   drinkDetailId: string;
+  drinkId?: string;
   drinkName: string;
   size: string;
   quantity: number;
   unitPrice: number;
   itemTotal: number;
-  note?: string;
+  note?: string | null;
 }
 
 export interface InvoiceItem {
   invoiceId: string;
+  invoiceCode?: string;
   shopId: string;
+  tableId?: string;
   shopName: string;
-  staffName: string;
+  staffName: string | null;
   tableNumber: number;
   totalAmount: number;
   status: string;
