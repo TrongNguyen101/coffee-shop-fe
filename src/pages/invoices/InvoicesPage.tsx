@@ -311,7 +311,7 @@ export function InvoicesPage() {
       {/* Drawer View invoice details */}
       <Drawer
         title={t('invoices.detailTitle')}
-        width={580}
+        size={580}
         open={detailOpen}
         onClose={() => setDetailOpen(false)}
         closable={true}

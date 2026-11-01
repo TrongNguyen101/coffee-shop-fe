@@ -26,7 +26,7 @@ npm run format      # prettier --write "src/**/*.{ts,tsx,css}"
 npm run build:prod
 ```
 
-Always run `npm run type-check` after making changes.
+Always run `npm run type-check` after making changes. Before finishing, run the CI scripts from the repo root: `./scripts/format.sh`, `./scripts/build-dev.sh`, `./scripts/build-prod.sh`.
 
 ## Feature Folder Convention
 
@@ -92,6 +92,22 @@ Prefer these over ad-hoc implementations:
 | `useConfirmModal` | [src/components/modal/ConfirmModal.tsx](src/components/modal/ConfirmModal.tsx) |
 | `useNotifyModal` | [src/components/modal/NotifyModal.tsx](src/components/modal/NotifyModal.tsx) |
 | `useToast` | [src/components/toast/useToast.ts](src/components/toast/useToast.ts) |
+| `OrderEditor` (menu + table + cart form shared by create order and edit invoice) | [src/components/order/OrderEditor.tsx](src/components/order/OrderEditor.tsx) |
+| `useOrderEditor` | [src/hooks/useOrderEditor.ts](src/hooks/useOrderEditor.ts) |
+
+### Where shared code goes
+
+Code used by 2+ features (extract it instead of duplicating; Jenkins/SonarQube check duplication):
+
+| Kind | Location |
+|---|---|
+| Component (`.tsx` only) | `src/components/<kind>/` |
+| Hook (`use*.ts`) | `src/hooks/` |
+| Shared types / DTOs | `src/types/<topic>.ts` |
+| Helpers | `src/utils/` |
+| Constants | `src/constants/` |
+
+Never put hooks or `.ts` type files inside `src/components/<kind>/` (exception already there: `toast/useToast.ts`).
 
 ## Adding a New Page
 
@@ -100,7 +116,7 @@ Prefer these over ad-hoc implementations:
 3. Register the route in [src/app/router.tsx](src/app/router.tsx) under `ProtectedRoute`.
 4. Add the nav entry in `NAV_ITEMS` ([src/layouts/MainLayout.tsx](src/layouts/MainLayout.tsx)) and its role list in `NAV_PERMISSIONS`.
 5. Add Vietnamese strings to `vn.json`.
-6. Run `npm run type-check` and `npm run format`.
+6. Run `./scripts/format.sh`, `./scripts/build-dev.sh` and `./scripts/build-prod.sh`.
 
 ## Conventions to Preserve
 
