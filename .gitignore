@@ -26,3 +26,6 @@ dist-ssr
 # Claude & reports
 .claude
 reports
+
+# API docs
+api-docs/
