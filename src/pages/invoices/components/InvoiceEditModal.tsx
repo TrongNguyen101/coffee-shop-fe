@@ -1,5 +1,7 @@
 import { useMemo } from 'react';
-import { Modal, Button, Divider } from 'antd';
+import { Divider } from 'antd';
+import { AppModal } from '@/components/modal/AppModal';
+import { SubmitButtons } from '@/components/button/SubmitButtons';
 import { useTranslation } from 'react-i18next';
 import { OrderEditor } from '@/components/order/OrderEditor';
 import { useOrderEditor } from '@/hooks/useOrderEditor';
@@ -57,28 +59,20 @@ function InvoiceEditModalBody({ open, onClose, record, onSubmit, loading = false
   };
 
   return (
-    <Modal
+    <AppModal
       open={open}
       onCancel={onClose}
-      centered
-      destroyOnHidden
       title={t('invoices.editTitle')}
       width={1280}
       mask={{ closable: !loading }}
-      footer={[
-        <Button key="cancel" onClick={onClose} disabled={loading}>
-          {t('form.cancel')}
-        </Button>,
-        <Button
-          key="save"
-          type="primary"
+      footer={
+        <SubmitButtons
+          onCancel={onClose}
+          onSubmit={handleSubmit}
           loading={loading}
-          disabled={editor.cart.length === 0 || !editor.tableId}
-          onClick={handleSubmit}
-        >
-          {t('form.save')}
-        </Button>,
-      ]}
+          disabled={!editor.canSubmit}
+        />
+      }
     >
       <div className="grid grid-cols-3 gap-x-4 gap-y-1 bg-gray-50 rounded-lg px-4 py-3 mb-4 text-sm">
         <div>
@@ -98,7 +92,7 @@ function InvoiceEditModalBody({ open, onClose, record, onSubmit, loading = false
       <Divider className="my-3!" />
 
       <OrderEditor editor={editor} />
-    </Modal>
+    </AppModal>
   );
 }
 

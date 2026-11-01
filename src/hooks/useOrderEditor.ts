@@ -218,6 +218,8 @@ export function useOrderEditor(open: boolean, shopId: string, initialOrder?: Ord
     tableId,
     loading,
     totalAmount,
+    // Order can be submitted once it has a table and at least one item
+    canSubmit: cart.length > 0 && !!tableId,
     setTableId,
     loadVariants,
     handleAddItem,

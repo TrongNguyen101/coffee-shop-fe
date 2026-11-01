@@ -1,5 +1,7 @@
 import { useTranslation } from 'react-i18next';
-import { Button, Modal, Typography } from 'antd';
+import { Button, Typography } from 'antd';
+import { AppModal } from '@/components/modal/AppModal';
+import { SubmitButtons } from '@/components/button/SubmitButtons';
 import { OrderEditor } from '@/components/order/OrderEditor';
 import { useDrinkOrder } from '../hooks/useDrinkOrder';
 
@@ -28,28 +30,21 @@ export function DrinkOrderModal({ open, shopId, onClose, onCreated }: Props) {
   };
 
   return (
-    <Modal
+    <AppModal
       open={open}
-      centered
       title={t('drinks.orderTitle')}
       onCancel={handleClose}
       width={1280}
-      destroyOnHidden
       mask={{ closable: !createLoading }}
-      footer={[
-        <Button key="cancel" onClick={handleClose} disabled={createLoading}>
-          {t('form.cancel')}
-        </Button>,
-        <Button
-          key="confirm"
-          type="primary"
+      footer={
+        <SubmitButtons
+          onCancel={handleClose}
+          onSubmit={handleCreateOrder}
+          submitText={t('drinks.orderConfirm')}
           loading={createLoading}
-          disabled={editor.cart.length === 0 || !editor.tableId}
-          onClick={handleCreateOrder}
-        >
-          {t('drinks.orderConfirm')}
-        </Button>,
-      ]}
+          disabled={!editor.canSubmit}
+        />
+      }
     >
       <OrderEditor
         editor={editor}
@@ -71,6 +66,6 @@ export function DrinkOrderModal({ open, shopId, onClose, onCreated }: Props) {
           </div>
         }
       />
-    </Modal>
+    </AppModal>
   );
 }

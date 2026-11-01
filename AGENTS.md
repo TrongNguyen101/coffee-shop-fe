@@ -89,7 +89,12 @@ Prefer these over ad-hoc implementations:
 | `TableGrid`, `AppColumnType` | [src/components/table/TableGrid.tsx](src/components/table/TableGrid.tsx) |
 | `SearchInput` | [src/components/search/SearchInput.tsx](src/components/search/SearchInput.tsx) |
 | `AppFormDrawer`, `FormFieldConfig` | [src/components/form/AppFormDrawer.tsx](src/components/form/AppFormDrawer.tsx) |
-| `useConfirmModal` | [src/components/modal/ConfirmModal.tsx](src/components/modal/ConfirmModal.tsx) |
+| `AppModal` (centered, destroyOnHidden) | [src/components/modal/AppModal.tsx](src/components/modal/AppModal.tsx) |
+| `SubmitButtons` (Cancel + Submit footer for modals/drawers) | [src/components/button/SubmitButtons.tsx](src/components/button/SubmitButtons.tsx) |
+| `CloseButton` (right-aligned Close footer for read-only drawers/modals) | [src/components/button/CloseButton.tsx](src/components/button/CloseButton.tsx) |
+| `CreateButton` (primary "Create" button in page headers) | [src/components/button/CreateButton.tsx](src/components/button/CreateButton.tsx) |
+| `EditIconButton`, `DeleteIconButton` (text icon buttons; pass `className`/`iconSize` for per-screen look) | [src/components/button/ActionIconButtons.tsx](src/components/button/ActionIconButtons.tsx) |
+| `useConfirmModal` (`confirm`, `confirmDelete` with shared delete labels) | [src/components/modal/ConfirmModal.tsx](src/components/modal/ConfirmModal.tsx) |
 | `useNotifyModal` | [src/components/modal/NotifyModal.tsx](src/components/modal/NotifyModal.tsx) |
 | `useToast` | [src/components/toast/useToast.ts](src/components/toast/useToast.ts) |
 | `OrderEditor` (menu + table + cart form shared by create order and edit invoice) | [src/components/order/OrderEditor.tsx](src/components/order/OrderEditor.tsx) |
