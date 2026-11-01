@@ -52,15 +52,15 @@ export interface InvoiceListResponse {
 }
 
 export interface CreateInvoiceRequest {
-  shopId?: string;
-  tableNumber: number;
+  shopId: string;
+  tableId: string;
+  // 0 = pay later, 1 = paid at the counter
+  status: 0 | 1;
   items: CreateInvoiceDetailItem[];
 }
 
 export interface CreateInvoiceDetailItem {
   drinkDetailId: string;
-  drinkName?: string;
-  size?: string;
   quantity: number;
   unitPrice: number;
   note?: string;
