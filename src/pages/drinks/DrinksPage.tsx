@@ -97,6 +97,12 @@ export function DrinksPage() {
 
   const canCreateOrder = !isOwner || !!currentShopId;
 
+  // OWNER sees drinks of every branch, so show which branch a drink belongs to
+  const getShopName = (shopId?: string) =>
+    isOwner ? shopOptions.find((option) => option.value === shopId)?.label : undefined;
+
+  const selectedShopName = getShopName(selected?.shopId);
+
   const canManageDetails = !isStaff && isDrinkActive(selected?.status) && !detailLoading;
 
   // Get sizes that are not currently used by the selected drink
@@ -336,6 +342,7 @@ export function DrinksPage() {
                 onDelete={handleDeleteDrink}
                 onEdit={handleOpenEdit}
                 isStaff={isStaff}
+                shopName={getShopName(drink.shopId)}
               />
             ))}
           </div>
@@ -387,6 +394,7 @@ export function DrinksPage() {
         selected={selected}
         detailLoading={detailLoading || deleteDetailLoading}
         isStaff={isStaff}
+        shopName={selectedShopName}
         onAdd={handleOpenCreateDetail}
         onEdit={handleOpenEditDetail}
         onDelete={handleDeleteDetail}

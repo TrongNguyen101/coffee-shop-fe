@@ -12,6 +12,7 @@ import {
   DrinkUploadAction,
 } from './DrinkFormFields';
 import { useFormApiError } from '@/hooks/useFormApiError';
+import { useDrinkImageUpload } from '../hooks/useDrinkImageUpload';
 import { findDrinkByName } from '../utils/utils';
 import { DEFAULT_DRINK_SIZE, DRINK_SIZES } from '../constants';
 
@@ -49,6 +50,7 @@ export function DrinkCreateModal({
 
   const [form] = Form.useForm<DrinkCreateFormValues>();
   const handleFormError = useFormApiError();
+  const imageUploadProps = useDrinkImageUpload();
 
   // Store selected drink image before submitting
   const [fileList, setFileList] = useState<UploadFile[]>([]);
@@ -173,10 +175,9 @@ export function DrinkCreateModal({
         <Upload
           listType="picture-card"
           fileList={fileList}
-          beforeUpload={() => false}
+          {...imageUploadProps}
           onChange={handleUploadChange}
           maxCount={1}
-          accept="image/*"
           disabled={!!matchedDrink}
         >
           {fileList.length < 1 && <DrinkUploadAction />}

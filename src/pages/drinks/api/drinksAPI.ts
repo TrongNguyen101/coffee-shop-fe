@@ -16,8 +16,12 @@ import type {
 // Field errors and duplicates (size on create, name on edit) are shown on the form
 const FORM_SUPPRESS_CODES = [RESPONSE_CODE.INVALID_REQUEST, RESPONSE_CODE.CONFLICT];
 
-// multipart body: part `data` (JSON) + optional part `image` (.jpg / .png).
-// Content-Type is left to the browser so it adds the multipart boundary.
+// The `api` instance defaults to JSON, which makes axios turn a FormData into JSON (and drop the
+// image, then the backend answers 415). Overriding it keeps the FormData; the browser adds the
+// multipart boundary itself.
+const MULTIPART_HEADERS = { 'Content-Type': 'multipart/form-data' };
+
+// multipart body: part `data` (JSON) + optional part `image` (.jpg / .png, max 5MB)
 function toDrinkFormData(payload: CreateDrinkRequest | EditDrinkRequest, imageFile?: File) {
   const formData = new FormData();
   formData.append('data', new Blob([JSON.stringify(payload)], { type: 'application/json' }));
@@ -48,7 +52,7 @@ export async function createDrinkApi(
   const response = await api.post<CreateDrinkResponse>(
     ENDPOINT.CREATE_DRINK,
     toDrinkFormData(payload, imageFile),
-    { suppressCodes: FORM_SUPPRESS_CODES },
+    { headers: MULTIPART_HEADERS, suppressCodes: FORM_SUPPRESS_CODES },
   );
   return response.data;
 }
@@ -67,7 +71,7 @@ export async function editDrinkApi(
   const response = await api.put<EditDrinkResponse>(
     ENDPOINT.EDIT_DRINK,
     toDrinkFormData(payload, imageFile),
-    { suppressCodes: FORM_SUPPRESS_CODES },
+    { headers: MULTIPART_HEADERS, suppressCodes: FORM_SUPPRESS_CODES },
   );
   return response.data;
 }

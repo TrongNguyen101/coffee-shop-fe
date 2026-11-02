@@ -89,7 +89,9 @@ export const BACKEND_MESSAGE_RULES: BackendMessageRule[] = [
   },
   { match: ['drink name is existed'], key: 'drinks.nameConflict', field: 'drinkName' },
   { match: ['at least one active size'], key: 'apiMessages.drinkLastSize' },
-  { match: ['only jpg and png', 'invalid file name'], key: 'apiMessages.imageInvalid' },
+  { match: ['only jpg and png', 'invalid file name'], key: 'drinks.imageTypeInvalid' },
+  { match: ['image file must not exceed'], key: 'drinks.imageTooLarge' },
+  { match: ['invalid image file'], key: 'drinks.imageNotValid' },
   { match: ['edit a drink from another shop'], key: 'drinks.permissionDeniedEditShop' },
 
   // Tables
