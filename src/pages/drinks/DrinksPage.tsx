@@ -251,9 +251,13 @@ export function DrinksPage() {
         size: record.size,
       }),
       onConfirm: async () => {
-        await deleteDrinkDetail({
-          drinkDetailId: record.drinkDetailId,
-        });
+        try {
+          await deleteDrinkDetail({
+            drinkDetailId: record.drinkDetailId,
+          });
+        } catch {
+          // The interceptor already shows the error (e.g. the last size cannot be deleted)
+        }
 
         await refreshSelectedDrink(drinkId);
       },

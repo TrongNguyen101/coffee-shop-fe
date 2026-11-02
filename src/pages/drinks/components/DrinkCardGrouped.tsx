@@ -2,6 +2,7 @@ import { Card, Typography, Tag } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { resolveImageUrl } from '@/utils/image';
 import type { DrinkItem } from '../types';
+import { isDrinkActive } from '../constants';
 import { formatPrice } from '@/utils/formatPrice';
 import { DeleteIconButton, EditIconButton } from '@/components/button/ActionIconButtons';
 
@@ -32,10 +33,7 @@ export function DrinkCardGrouped({ record, onClick, onDelete, onEdit, isStaff = 
   }, undefined);
 
   // Check current drink selling status
-  const isActive =
-    record.status === t('drinks.statusActive') ||
-    record.status === 'ACTIVE' ||
-    record.status === '1';
+  const isActive = isDrinkActive(record.status);
 
   return (
     <Card

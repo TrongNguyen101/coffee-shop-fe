@@ -11,7 +11,7 @@ import {
   DrinkStatusField,
   DrinkUploadAction,
 } from './DrinkFormFields';
-import { setDrinkNameConflictError } from '../utils/utils';
+import { useFormApiError } from '@/hooks/useFormApiError';
 
 interface DrinkEditFormValues {
   drinkId: string;
@@ -64,6 +64,7 @@ export function DrinkEditModal({
   const { t } = useTranslation();
 
   const [form] = Form.useForm<DrinkEditFormValues>();
+  const handleFormError = useFormApiError();
 
   // Track modal opening to prevent resetting form multiple times
   const isOpenedRef = useRef(false);
@@ -137,9 +138,9 @@ export function DrinkEditModal({
       );
 
       handleClose();
-    } catch (error: unknown) {
-      // Show drink name conflict error on the form
-      setDrinkNameConflictError(error, form, t('drinks.nameConflict'));
+    } catch (error) {
+      // e.g. a duplicated name goes to the drink name field
+      handleFormError(error, form);
     }
   };
 
