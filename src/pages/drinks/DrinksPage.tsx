@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { PlusOutlined } from '@ant-design/icons';
-import { Pagination, Empty, Spin, Button, Typography, Select } from 'antd';
+import { ShoppingCartOutlined } from '@ant-design/icons';
+import { Pagination, Empty, Spin, Button, Typography, Select, Tooltip } from 'antd';
 import { SearchInput } from '@/components/search/SearchInput';
 import { useNotifyModal } from '@/components/modal/NotifyModal';
+import { useSearchValidation } from '@/hooks/useSearchValidation';
 import { useConfirmModal } from '@/components/modal/ConfirmModal';
 import { useAppSelector } from '@/store/hooks';
 import { ROLES } from '@/permission/roles';
@@ -17,14 +18,15 @@ import { DrinkCreateModal } from './components/DrinkCreateModal';
 import { DrinkEditModal } from './components/DrinkEditModal';
 import { DrinkDetailDrawer } from './components/DrinkDetailDrawer';
 import { DrinkDetailFormModal } from './components/DrinkDetailFormModal';
-
-const SEARCH_REGEX = /^[\p{L}\p{N}\s\-&/(),.']*$/u;
+import { DrinkOrderModal } from './components/DrinkOrderModal';
+import { CreateButton } from '@/components/button/CreateButton';
 
 export function DrinksPage() {
   const { t } = useTranslation();
 
   const { showError } = useNotifyModal();
-  const { confirm: confirmDelete } = useConfirmModal();
+  const validateSearch = useSearchValidation();
+  const { confirmDelete } = useConfirmModal();
 
   // Role authorization checks
   const roleName = useAppSelector((state) => state.auth.profile?.roleName);
@@ -81,6 +83,7 @@ export function DrinksPage() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [detailLoading, setDetailLoading] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
+  const [orderOpen, setOrderOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [createDetailOpen, setCreateDetailOpen] = useState(false);
   const [editDetailOpen, setEditDetailOpen] = useState(false);
@@ -89,6 +92,16 @@ export function DrinksPage() {
   const [selected, setSelected] = useState<DrinkItem | null>(null);
   const [selectedEditRecord, setSelectedEditRecord] = useState<DrinkItem | null>(null);
   const [selectedDetail, setSelectedDetail] = useState<DrinkVariantItem | null>(null);
+
+  // OWNER must pick a shop filter before ordering; other roles use their own shop
+
+  const canCreateOrder = !isOwner || !!currentShopId;
+
+  // OWNER sees drinks of every branch, so show which branch a drink belongs to
+  const getShopName = (shopId?: string) =>
+    isOwner ? shopOptions.find((option) => option.value === shopId)?.label : undefined;
+
+  const selectedShopName = getShopName(selected?.shopId);
 
   const canManageDetails = !isStaff && isDrinkActive(selected?.status) && !detailLoading;
 
@@ -101,23 +114,21 @@ export function DrinksPage() {
     return DRINK_SIZES.filter((size) => !existingSizes.has(size));
   }, [selected?.variants]);
 
-  // Validate search keyword before sending request
+  // Sizes the edited variant can switch to: its own size and sizes no other variant uses
+  const editableDetailSizes = useMemo(() => {
+    const normalize = (size: string) => size.trim().toUpperCase();
+    const otherSizes = new Set(
+      (selected?.variants ?? [])
+        .filter((variant) => variant.drinkDetailId !== selectedDetail?.drinkDetailId)
+        .map((variant) => normalize(variant.size)),
+    );
+    const ownSize = selectedDetail ? normalize(selectedDetail.size) : '';
+
+    return DRINK_SIZES.filter((size) => size === ownSize || !otherSizes.has(size));
+  }, [selected?.variants, selectedDetail]);
+
   const handleDrinkSearch = (value: string) => {
-    const trimmedValue = value.trim();
-
-    if (trimmedValue.length > 100) {
-      showError(t('responses.EV005'), t('common.error'));
-
-      return;
-    }
-
-    if (trimmedValue && !SEARCH_REGEX.test(trimmedValue)) {
-      showError(t('responses.EV007'), t('common.error'));
-
-      return;
-    }
-
-    handleSearch(value);
+    if (validateSearch(value)) handleSearch(value);
   };
 
   // Open drink detail drawer and fetch latest drink data
@@ -171,9 +182,6 @@ export function DrinksPage() {
     confirmDelete({
       title: t('table.deleteConfirmTitle'),
       content: t('table.deleteConfirmDesc'),
-      okText: t('table.deleteOk'),
-      cancelText: t('table.deleteCancel'),
-      okDanger: true,
       onConfirm: () => deleteDrink(targetId),
     });
   };
@@ -246,13 +254,14 @@ export function DrinksPage() {
       content: t('drinkDetails.deleteConfirmDesc', {
         size: record.size,
       }),
-      okText: t('form.delete'),
-      cancelText: t('form.cancel'),
-      okDanger: true,
       onConfirm: async () => {
-        await deleteDrinkDetail({
-          drinkDetailId: record.drinkDetailId,
-        });
+        try {
+          await deleteDrinkDetail({
+            drinkDetailId: record.drinkDetailId,
+          });
+        } catch {
+          // The interceptor already shows the error (e.g. the last size cannot be deleted)
+        }
 
         await refreshSelectedDrink(drinkId);
       },
@@ -289,16 +298,21 @@ export function DrinksPage() {
           />
         )}
 
-        {/* Create Drink Button (hidden for STAFF) */}
-        {!isStaff && (
+        {/* Create Order Button (cash payment, creates a paid invoice) */}
+        <Tooltip title={canCreateOrder ? undefined : t('drinks.orderSelectShopHint')}>
           <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={() => setCreateOpen(true)}
+            icon={<ShoppingCartOutlined />}
+            disabled={!canCreateOrder}
+            onClick={() => setOrderOpen(true)}
             className="w-full sm:w-auto"
           >
-            {t('form.create')}
+            {t('drinks.orderBtn')}
           </Button>
+        </Tooltip>
+
+        {/* Create Drink Button (hidden for STAFF) */}
+        {!isStaff && (
+          <CreateButton onClick={() => setCreateOpen(true)} className="w-full sm:w-auto" />
         )}
       </div>
 
@@ -326,6 +340,7 @@ export function DrinksPage() {
                 onDelete={handleDeleteDrink}
                 onEdit={handleOpenEdit}
                 isStaff={isStaff}
+                shopName={getShopName(drink.shopId)}
               />
             ))}
           </div>
@@ -377,6 +392,7 @@ export function DrinksPage() {
         selected={selected}
         detailLoading={detailLoading || deleteDetailLoading}
         isStaff={isStaff}
+        shopName={selectedShopName}
         onAdd={handleOpenCreateDetail}
         onEdit={handleOpenEditDetail}
         onDelete={handleDeleteDetail}
@@ -397,13 +413,21 @@ export function DrinksPage() {
         open={editDetailOpen}
         mode="edit"
         record={selectedDetail}
-        availableSizes={DRINK_SIZES}
+        availableSizes={editableDetailSizes}
         loading={editDetailLoading}
         onClose={() => {
           setEditDetailOpen(false);
           setSelectedDetail(null);
         }}
         onSubmit={handleEditDetail}
+      />
+
+      {/* Create Order Modal */}
+      <DrinkOrderModal
+        open={orderOpen}
+        shopId={currentShopId}
+        onClose={() => setOrderOpen(false)}
+        onCreated={() => setOrderOpen(false)}
       />
 
       {/* Create Drink Modal */}
@@ -413,6 +437,7 @@ export function DrinksPage() {
         onSubmit={createDrink}
         loading={createLoading}
         categoryOptions={categoryOptions}
+        drinks={items}
       />
 
       {/* Edit Drink Modal */}
