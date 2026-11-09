@@ -1,6 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { getInvoicesApi, editInvoiceApi, updateInvoiceStatusApi } from '../api/invoicesAPI';
+import {
+  getInvoicesApi,
+  editInvoiceApi,
+  payInvoiceApi,
+  cancelInvoiceApi,
+} from '../api/invoicesAPI';
 import { useShopOptions } from '@/hooks/useShopOptions';
 import { useToast } from '@/components/toast/useToast';
 import { useAppSelector } from '@/store/hooks';
@@ -8,7 +13,6 @@ import { ROLES } from '@/permission/roles';
 import type { PaginationInfo } from '@/types/api';
 import { isApiReloadError } from '@/utils/apiError';
 import {
-  INVOICE_STATUS,
   INVOICE_STATUS_NAME,
   type InvoiceItem,
   type InvoiceListParams,
@@ -118,7 +122,7 @@ export function useInvoices() {
     async (invoiceId: string) => {
       setPayLoading(true);
       try {
-        await updateInvoiceStatusApi({ invoiceId, status: INVOICE_STATUS.COMPLETED });
+        await payInvoiceApi({ invoiceId });
         toast.success(t('invoices.paySuccess'));
         await fetchInvoices(params);
       } catch (error) {
@@ -135,7 +139,7 @@ export function useInvoices() {
     async (invoiceId: string) => {
       setCancelLoading(true);
       try {
-        await updateInvoiceStatusApi({ invoiceId, status: INVOICE_STATUS.CANCELLED });
+        await cancelInvoiceApi({ invoiceId });
         toast.success(t('invoices.cancelSuccess'));
         await fetchInvoices(params);
       } catch (error) {

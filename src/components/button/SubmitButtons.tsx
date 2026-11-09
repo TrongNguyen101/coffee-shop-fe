@@ -9,6 +9,8 @@ interface SubmitButtonsProps {
   readonly submitText?: ReactNode;
   readonly loading?: boolean;
   readonly disabled?: boolean;
+  // Show the submit button before Cancel (default: Cancel first)
+  readonly submitFirst?: boolean;
 }
 
 // Cancel + submit buttons, used as a modal or drawer footer
@@ -18,17 +20,20 @@ export function SubmitButtons({
   submitText,
   loading = false,
   disabled = false,
+  submitFirst = false,
 }: SubmitButtonsProps) {
   const { t } = useTranslation();
 
-  return (
-    <>
-      <Button onClick={onCancel} disabled={loading}>
-        {t('form.cancel')}
-      </Button>
-      <Button type="primary" loading={loading} disabled={disabled} onClick={onSubmit}>
-        {submitText ?? t('form.save')}
-      </Button>
-    </>
+  const cancelButton = (
+    <Button key="cancel" onClick={onCancel} disabled={loading}>
+      {t('form.cancel')}
+    </Button>
   );
+  const submitButton = (
+    <Button key="submit" type="primary" loading={loading} disabled={disabled} onClick={onSubmit}>
+      {submitText ?? t('form.save')}
+    </Button>
+  );
+
+  return <>{submitFirst ? [submitButton, cancelButton] : [cancelButton, submitButton]}</>;
 }

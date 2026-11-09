@@ -1,15 +1,5 @@
 import { useEffect, useState } from 'react';
-import {
-  Typography,
-  Select,
-  Tag,
-  Button,
-  Tooltip,
-  Drawer,
-  Descriptions,
-  Table,
-  Divider,
-} from 'antd';
+import { Typography, Select, Tag, Button, Tooltip, Drawer, Descriptions, Table } from 'antd';
 import { CreditCardOutlined, StopOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '@/store/hooks';
@@ -36,6 +26,7 @@ interface InvoiceDetailItem {
   quantity?: number;
   subTotal?: number;
   totalPrice?: number;
+  note?: string | null;
 }
 
 const formatDate = (value: unknown) =>
@@ -303,7 +294,7 @@ export function InvoicesPage() {
         footer={<CloseButton onClose={() => setDetailOpen(false)} />}
       >
         {selectedRecord && (
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-3">
             <Descriptions size="small" column={1} bordered>
               <Descriptions.Item label={t('invoices.invoiceCode')}>
                 {selectedRecord.invoiceCode || '—'}
@@ -327,8 +318,6 @@ export function InvoicesPage() {
               </Descriptions.Item>
             </Descriptions>
 
-            <Divider className="my-2" />
-
             <Typography.Text strong className="text-base">
               {t('invoices.itemsList')}
             </Typography.Text>
@@ -343,7 +332,17 @@ export function InvoicesPage() {
                   title: t('invoices.drinkName'),
                   dataIndex: 'drinkName',
                   key: 'drinkName',
-                  render: (val: string | undefined, r: InvoiceDetailItem) => val || r.name || '—',
+                  // The note (if any) is shown under the drink name
+                  render: (val: string | undefined, r: InvoiceDetailItem) => (
+                    <div className="flex flex-col">
+                      <span>{val || r.name || '—'}</span>
+                      {r.note?.trim() && (
+                        <Typography.Text type="secondary" className="text-xs">
+                          {t('invoices.note')}: {r.note}
+                        </Typography.Text>
+                      )}
+                    </div>
+                  ),
                 },
                 {
                   title: t('invoices.size'),
@@ -386,7 +385,7 @@ export function InvoicesPage() {
               ]}
             />
 
-            <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg mt-2 border">
+            <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg border">
               <span className="font-semibold text-gray-700">{t('invoices.totalAmount')}:</span>
               <span className="font-bold text-lg text-emerald-600">
                 {Number(selectedRecord.totalAmount || 0).toLocaleString('vi-VN')} đ
