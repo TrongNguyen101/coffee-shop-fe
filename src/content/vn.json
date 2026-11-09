@@ -51,8 +51,10 @@
     "pay": "Thanh toán",
     "cancel": "Hủy đơn",
     "payConfirmTitle": "Xác nhận thanh toán",
-    "payConfirmDesc": "Bạn có chắc chắn muốn hoàn tất thanh toán hóa đơn này không?",
-    "payOk": "Thanh toán",
+    "payPrintDesc": "Hoàn tất thanh toán hóa đơn này. Bạn có muốn in hóa đơn không?",
+    "payPrint": "In hóa đơn",
+    "payNoPrint": "Không in",
+    "print": "In hóa đơn",
     "cancelConfirmTitle": "Xác nhận hủy hóa đơn",
     "cancelConfirmDesc": "Bạn có chắc chắn muốn hủy hóa đơn này không? Thao tác này không thể hoàn tác.",
     "cancelOk": "Hủy đơn",
@@ -385,6 +387,7 @@
     "EV011": "Trạng thái không hợp lệ."
   },
   "apiMessages": {
+    "invoicePrintUnpaid": "Chỉ in được hóa đơn đã thanh toán.",
     "staleData": "Dữ liệu đã bị xoá hoặc thay đổi bởi thao tác khác. Danh sách sẽ được tải lại.",
     "reload": "Dữ liệu đã thay đổi. Vui lòng tải lại và thử lại.",
     "notAssignedShop": "Tài khoản chưa được gán vào chi nhánh nào.",

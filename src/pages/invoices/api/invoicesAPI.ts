@@ -7,6 +7,7 @@ import type {
   EditInvoiceRequest,
   PayInvoiceRequest,
   CancelInvoiceRequest,
+  PrintInvoiceRequest,
   InvoiceActionResponse,
 } from '../types';
 
@@ -39,5 +40,13 @@ export async function cancelInvoiceApi(
   payload: CancelInvoiceRequest,
 ): Promise<InvoiceActionResponse> {
   const response = await api.put<InvoiceActionResponse>(ENDPOINT.CANCEL_INVOICE, payload);
+  return response.data;
+}
+
+// 80mm receipt PDF (errors still come back as JSON, parsed by the api interceptor)
+export async function printInvoiceApi(payload: PrintInvoiceRequest): Promise<Blob> {
+  const response = await api.post<Blob>(ENDPOINT.PRINT_INVOICE, payload, {
+    responseType: 'blob',
+  });
   return response.data;
 }

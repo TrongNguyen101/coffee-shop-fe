@@ -86,4 +86,7 @@ export interface PayInvoiceRequest {
 
 export type CancelInvoiceRequest = PayInvoiceRequest;
 
+// Only COMPLETED (paid) invoices can be printed; the response is a PDF file
+export type PrintInvoiceRequest = PayInvoiceRequest;
+
 export type InvoiceActionResponse = ApiResponse;

@@ -41,6 +41,7 @@ export const ENDPOINT = {
   EDIT_INVOICE: '/invoice/edit',
   PAY_INVOICE: '/invoice/pay',
   CANCEL_INVOICE: '/invoice/cancel',
+  PRINT_INVOICE: '/invoices/print',
 
   // Tables (create is plural on the backend)
   GET_TABLES: '/tables',
