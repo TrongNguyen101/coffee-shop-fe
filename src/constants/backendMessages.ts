@@ -102,6 +102,10 @@ export const BACKEND_MESSAGE_RULES: BackendMessageRule[] = [
     field: 'tableNumber',
   },
   { match: ['can not delete table with pending invoices'], key: 'tables.deletePendingInvoices' },
+  {
+    match: ['can not change table status while pending invoices'],
+    key: 'tables.statusPendingInvoices',
+  },
   { match: ['table does not belong'], key: 'apiMessages.tableNotBelong', reload: true },
 
   // Revenue
