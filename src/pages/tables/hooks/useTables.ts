@@ -3,12 +3,13 @@ import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '@/store/hooks';
 import { ROLES } from '@/permission/roles';
 import { useToast } from '@/components/toast/useToast';
-import { getShopNamesApi } from '@/pages/staffs/api/staffsApi';
+import { useShopOptions } from '@/hooks/useShopOptions';
+import type { PaginationInfo } from '@/types/api';
+import { isApiReloadError } from '@/utils/apiError';
 import { getTablesApi, createTableApi, editTableApi, deleteTableApi } from '../api/tablesApi';
-import type { SearchTablesRequest, TableItem, TablePagination, ShopNameItem } from '../types';
+import type { SearchTablesRequest, TableItem } from '../types';
 import type { TableCreateValues } from '../components/TableCreateModal';
 import type { TableEditValues } from '../components/TableEditModal';
-import { getTableDeleteErrorMessage } from '../utils/utils';
 
 const DEFAULT_PARAMS: SearchTablesRequest = {
   page: 1,
@@ -21,8 +22,7 @@ const DEFAULT_PARAMS: SearchTablesRequest = {
 export function useTables(initialPage = 1, initialSize = 10) {
   const toast = useToast();
   const { t } = useTranslation();
-  const profile = useAppSelector((state) => state.auth.profile);
-  const roleName = profile?.roleName;
+  const roleName = useAppSelector((state) => state.auth.profile?.roleName);
 
   const [params, setParams] = useState<SearchTablesRequest>({
     ...DEFAULT_PARAMS,
@@ -31,7 +31,7 @@ export function useTables(initialPage = 1, initialSize = 10) {
   });
 
   const [items, setItems] = useState<TableItem[]>([]);
-  const [pagination, setPagination] = useState<TablePagination | null>(null);
+  const [pagination, setPagination] = useState<PaginationInfo | null>(null);
   const [loading, setLoading] = useState(false);
   const [searchLoading, setSearchLoading] = useState(false);
   const [showEmptyModal, setShowEmptyModal] = useState(false);
@@ -41,8 +41,7 @@ export function useTables(initialPage = 1, initialSize = 10) {
   const [editLoading, setEditLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
-  const [shopNames, setShopNames] = useState<ShopNameItem[]>([]);
-  const [optionsLoading, setOptionsLoading] = useState(false);
+  const { shopNames, shopOptions, optionsLoading } = useShopOptions();
 
   const fetchTables = useCallback(
     async (currentParams: SearchTablesRequest, isSearchAction = false) => {
@@ -84,24 +83,6 @@ export function useTables(initialPage = 1, initialSize = 10) {
     [],
   );
 
-  // Dropdown data: OWNER and MANAGER need the shop list
-  useEffect(() => {
-    async function fetchOptions() {
-      if (roleName !== ROLES.OWNER && roleName !== ROLES.MANAGER) return;
-
-      setOptionsLoading(true);
-      try {
-        const shopNamesRes = await getShopNamesApi();
-        setShopNames(shopNamesRes.shopNameResults || []);
-      } catch (err) {
-        console.error('Failed to fetch shop names:', err);
-      } finally {
-        setOptionsLoading(false);
-      }
-    }
-    void fetchOptions();
-  }, [roleName]);
-
   useEffect(() => {
     let isMounted = true;
 
@@ -123,16 +104,10 @@ export function useTables(initialPage = 1, initialSize = 10) {
       if (record?.shopId) return record.shopId;
       if (roleName === ROLES.OWNER) return params.shopId ?? '';
 
-      const profileShopId = (profile as { shopId?: string } | null)?.shopId;
-      if (profileShopId) return profileShopId;
-
-      const profileShopName = (profile?.shopName ?? '').trim().toLowerCase();
-      return (
-        shopNames.find((shop) => shop.shopName.trim().toLowerCase() === profileShopName)?.shopId ??
-        ''
-      );
+      // MANAGER: the shop options only contain their own shop
+      return shopNames[0]?.shopId ?? '';
     },
-    [roleName, profile, params.shopId, shopNames],
+    [roleName, params.shopId, shopNames],
   );
 
   const handleSearch = (search: string) => {
@@ -203,6 +178,10 @@ export function useTables(initialPage = 1, initialSize = 10) {
         });
         toast.success(t('tables.editSuccess'));
         await fetchTables(params);
+      } catch (error) {
+        // Errors are shown on the form by the modal
+        if (isApiReloadError(error)) await fetchTables(params);
+        throw error;
       } finally {
         setEditLoading(false);
       }
@@ -234,8 +213,8 @@ export function useTables(initialPage = 1, initialSize = 10) {
           await fetchTables(params);
         }
       } catch (error) {
-        const message = getTableDeleteErrorMessage(error, t('tables.deletePendingInvoices'));
-        if (message) toast.error(message);
+        // The interceptor already shows the error message
+        if (isApiReloadError(error)) await fetchTables(params);
         throw error;
       } finally {
         setDeleteLoading(false);
@@ -243,8 +222,6 @@ export function useTables(initialPage = 1, initialSize = 10) {
     },
     [resolveShopId, fetchTables, params, items.length, toast, t],
   );
-
-  const shopOptions = shopNames.map((shop) => ({ value: shop.shopId, label: shop.shopName }));
 
   return {
     items,
