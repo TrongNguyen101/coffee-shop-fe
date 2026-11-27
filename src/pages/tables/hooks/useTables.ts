@@ -5,7 +5,7 @@ import { ROLES } from '@/permission/roles';
 import { useToast } from '@/components/toast/useToast';
 import { useShopOptions } from '@/hooks/useShopOptions';
 import type { PaginationInfo } from '@/types/api';
-import { isApiReloadError } from '@/utils/apiError';
+import { getApiErrorMessage, isApiReloadError } from '@/utils/apiError';
 import { getTablesApi, createTableApi, editTableApi, deleteTableApi } from '../api/tablesApi';
 import type { SearchTablesRequest, TableItem } from '../types';
 import type { TableCreateValues } from '../components/TableCreateModal';
@@ -40,6 +40,8 @@ export function useTables(initialPage = 1, initialSize = 10) {
   const [createLoading, setCreateLoading] = useState(false);
   const [editLoading, setEditLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  // tableId of the card whose status is being changed (one change at a time)
+  const [statusLoadingId, setStatusLoadingId] = useState<string | null>(null);
 
   const { shopNames, shopOptions, optionsLoading } = useShopOptions();
 
@@ -189,6 +191,39 @@ export function useTables(initialPage = 1, initialSize = 10) {
     [resolveShopId, fetchTables, params, toast, t],
   );
 
+  // Quick status change from the card: same edit endpoint, only the status differs
+  const changeTableStatus = useCallback(
+    async (record: TableItem, status: number) => {
+      if (!record.tableId || record.status === status) return;
+
+      const shopId = record.shopId || resolveShopId(record);
+      if (!shopId) {
+        toast.error(t('tables.selectShopFirst'));
+        return;
+      }
+
+      setStatusLoadingId(record.tableId);
+      try {
+        await editTableApi({
+          tableId: record.tableId,
+          tableNumber: record.tableNumber,
+          description: record.description?.trim() || undefined,
+          status,
+          shopId,
+        });
+        toast.success(t('tables.statusChangeSuccess'));
+        await fetchTables(params);
+      } catch (error) {
+        // editTableApi suppresses form error codes, so show the message here
+        toast.error(getApiErrorMessage(error));
+        if (isApiReloadError(error)) await fetchTables(params);
+      } finally {
+        setStatusLoadingId(null);
+      }
+    },
+    [resolveShopId, fetchTables, params, toast, t],
+  );
+
   const deleteTable = useCallback(
     async (record: TableItem) => {
       if (!record.tableId) {
@@ -237,6 +272,7 @@ export function useTables(initialPage = 1, initialSize = 10) {
     createLoading,
     editLoading,
     deleteLoading,
+    statusLoadingId,
     optionsLoading,
     shopOptions,
     showEmptyModal,
@@ -247,6 +283,7 @@ export function useTables(initialPage = 1, initialSize = 10) {
     handlePageChange,
     createTable,
     editTable,
+    changeTableStatus,
     deleteTable,
     refresh: () => fetchTables(params, false),
   };
