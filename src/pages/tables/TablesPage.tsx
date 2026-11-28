@@ -238,7 +238,7 @@ export function TablesPage() {
                 onClick={handleOpenDetail}
                 onEdit={isStaff ? undefined : handleOpenEdit}
                 onDelete={isStaff ? undefined : handleDeleteClick}
-                onStatusChange={isStaff ? undefined : changeTableStatus}
+                onStatusChange={changeTableStatus}
                 statusLoading={statusLoadingId === record.tableId}
               />
             ))}

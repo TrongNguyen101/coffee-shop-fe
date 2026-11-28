@@ -15,8 +15,8 @@ import type { StaffItem } from './types';
 import { CreateButton } from '@/components/button/CreateButton';
 import { ResetPasswordIconButton } from '@/components/button/ActionIconButtons';
 
-// Same rule as the shop search, plus the characters of username / email (@ _ +) and full name ( )
-const SEARCH_PATTERN = /^[\p{L}\p{N}\s.,/&'()@_+#-]*$/u;
+// Must match the BE rule for POST /staffs search (no ( ) ' +): letters, digits, spaces, . , / & @ _ # -
+const SEARCH_PATTERN = /^[\p{L}\p{N}\s.,/&@_#-]*$/u;
 const SEARCH_MAX_LENGTH = 100;
 
 const formatDate = (value: unknown) =>

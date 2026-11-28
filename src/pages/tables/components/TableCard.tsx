@@ -9,7 +9,7 @@ interface TableCardProps {
   readonly onClick?: (record: TableItem) => void;
   readonly onEdit?: (record: TableItem) => void;
   readonly onDelete?: (record: TableItem) => void;
-  // Omitted = no quick status buttons (e.g. STAFF cannot edit tables)
+  // Omitted = no quick status buttons; the status is shown as text instead
   readonly onStatusChange?: (record: TableItem, status: number) => void;
   readonly statusLoading?: boolean;
 }
@@ -57,7 +57,7 @@ export function TableCard({
           </span>
         </span>
 
-        {/* Without quick buttons (STAFF) the status is shown as text */}
+        {/* Without quick buttons the status is shown as text */}
         {!onStatusChange && (
           <span className="max-w-full truncate rounded-full bg-slate-50 px-2 py-0.5 text-[10px] font-medium text-slate-600 sm:text-xs @2xs:px-3 @2xs:py-1 @2xs:text-sm">
             {t(tableStatusKey(record.status))}

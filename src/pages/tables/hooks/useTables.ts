@@ -5,8 +5,14 @@ import { ROLES } from '@/permission/roles';
 import { useToast } from '@/components/toast/useToast';
 import { useShopOptions } from '@/hooks/useShopOptions';
 import type { PaginationInfo } from '@/types/api';
-import { getApiErrorMessage, isApiReloadError } from '@/utils/apiError';
-import { getTablesApi, createTableApi, editTableApi, deleteTableApi } from '../api/tablesApi';
+import { isApiReloadError } from '@/utils/apiError';
+import {
+  getTablesApi,
+  createTableApi,
+  editTableApi,
+  deleteTableApi,
+  changeTableStatusApi,
+} from '../api/tablesApi';
 import type { SearchTablesRequest, TableItem } from '../types';
 import type { TableCreateValues } from '../components/TableCreateModal';
 import type { TableEditValues } from '../components/TableEditModal';
@@ -191,37 +197,23 @@ export function useTables(initialPage = 1, initialSize = 10) {
     [resolveShopId, fetchTables, params, toast, t],
   );
 
-  // Quick status change from the card: same edit endpoint, only the status differs
+  // Quick status change from the card (every role): release / occupy / reserve by target status
   const changeTableStatus = useCallback(
     async (record: TableItem, status: number) => {
       if (!record.tableId || record.status === status) return;
 
-      const shopId = record.shopId || resolveShopId(record);
-      if (!shopId) {
-        toast.error(t('tables.selectShopFirst'));
-        return;
-      }
-
       setStatusLoadingId(record.tableId);
       try {
-        await editTableApi({
-          tableId: record.tableId,
-          tableNumber: record.tableNumber,
-          description: record.description?.trim() || undefined,
-          status,
-          shopId,
-        });
+        await changeTableStatusApi(status, { tableId: record.tableId });
         toast.success(t('tables.statusChangeSuccess'));
-        await fetchTables(params);
-      } catch (error) {
-        // editTableApi suppresses form error codes, so show the message here
-        toast.error(getApiErrorMessage(error));
-        if (isApiReloadError(error)) await fetchTables(params);
+      } catch {
+        // The interceptor already shows the message; any error means the map may be stale
       } finally {
         setStatusLoadingId(null);
       }
+      await fetchTables(params);
     },
-    [resolveShopId, fetchTables, params, toast, t],
+    [fetchTables, params, toast, t],
   );
 
   const deleteTable = useCallback(

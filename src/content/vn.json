@@ -339,6 +339,7 @@
     "deletePendingInvoices": "Không thể xóa bàn đang có hóa đơn chưa thanh toán.",
     "deleteConfirmDesc": "Bạn có chắc chắn muốn xoá bàn {{name}} không?",
     "statusChangeSuccess": "Đổi trạng thái bàn thành công.",
+    "statusAlreadySet": "Trạng thái bàn vừa được cập nhật ở thiết bị khác. Sơ đồ bàn đã được làm mới.",
     "statusShortOptions": {
       "available": "Trống",
       "occupied": "Có khách",
